@@ -8,7 +8,7 @@
 <p align="center">
   <img src="https://img.shields.io/badge/license-mit-blue.svg">
   <img src="https://img.shields.io/badge/python-3.6--3.8-blue">
-  <img src="https://img.shields.io/pypi/v/embgam?color=green">  
+  <img src="https://img.shields.io/pypi/v/imodelsx?color=green">  
 </p>  
 
 
@@ -18,12 +18,13 @@
 </b> Emb-GAM uses a pre-trained language model to extract features from text data then combines them in order to extract out a simple, linear model.
 
 # Quickstart
-**Installation**: `pip install embgam` (or, for more control, clone and install from source)
+**Installation**: The best way to use Emb-GAM is through the [imodelsx](https://github.com/csinva/imodelsX) package: `pip install imodelsx`
+  - For finer control, you can instead clone and install this repo from source
 
 **Usage example** (see <a href="https://csinva.github.io/emb-gam/">api</a> or <a href="https://github.com/csinva/emb-gam/blob/master/demo.ipynb">demo notebook</a> for more details):
 
 ```python
-from embgam import EmbGAMClassifier
+from imodelsx import EmbGAMClassifier
 import datasets
 import numpy as np
 
@@ -69,6 +70,7 @@ Across a variety of natural-language-processing datasets, Emb-GAM achieves stron
 - stored outputs after running all experiments are available in [this gdrive folder](https://drive.google.com/file/d/1C5ooDIlFdPxROufWWjlPr4Wmx8hDYBnh/view?usp=sharing)
 
 # Related work
+- imodelsX package ([github](https://github.com/csinva/imodelsX)) - interpretability for text datasets
 - imodels package (JOSS 2021 [github](https://github.com/csinva/imodels)) - interpretable ML package for concise, transparent, and accurate predictive modeling (sklearn-compatible).
 - Adaptive wavelet distillation (NeurIPS 2021 [pdf](https://arxiv.org/abs/2107.09145), [github](https://github.com/Yu-Group/adaptive-wavelets)) - distilling a neural network into a concise wavelet model
 - Transformation importance (ICLR 2020 workshop [pdf](https://arxiv.org/abs/2003.01926), [github](https://github.com/csinva/transformation-importance)) - using simple reparameterizations, allows for calculating disentangled importances to transformations of the input (e.g. assigning importances to different frequencies)
@@ -77,7 +79,7 @@ Across a variety of natural-language-processing datasets, Emb-GAM achieves stron
 - PDR interpretability framework (PNAS 2019 [pdf](https://arxiv.org/abs/1901.04592)) - an overarching framewwork for guiding and framing interpretable machine learning
 
 
-If this package is useful for you, please cite the following!
+If this work is useful for you, please cite the following!
 
 ```r
 @article{singh2022embgam,

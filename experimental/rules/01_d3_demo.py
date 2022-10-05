@@ -11,9 +11,11 @@ if __name__ == '__main__':
     distribution_pairs = json.load(open('benchmark.json'))
     all_h2score = []
     for i, d in enumerate(tqdm.tqdm(distribution_pairs)):
+        print('examples', len(d['positive_samples']), len(d['negative_samples']))
+        N = 10
         h2score = iprompt.explain_d3(
-            pos=d['positive_samples'], 
-            neg=d['negative_samples'], 
+            pos=d['positive_samples'][:N], 
+            neg=d['negative_samples'][:N], 
             note=f'benchmark {i}; can be anything, for logging purpose only',
             num_steps=100,
             num_folds=2,
