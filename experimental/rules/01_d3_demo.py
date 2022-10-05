@@ -1,7 +1,7 @@
 import os
 import random
 import pickle as pkl
-import iprompt
+import imodelsx
 import json
 from typing import List
 import tqdm
@@ -13,7 +13,7 @@ if __name__ == '__main__':
     for i, d in enumerate(tqdm.tqdm(distribution_pairs)):
         print('examples', len(d['positive_samples']), len(d['negative_samples']))
         N = 10
-        h2score = iprompt.explain_d3(
+        h2score = imodelsx.explain_d3(
             pos=d['positive_samples'][:N], 
             neg=d['negative_samples'][:N], 
             note=f'benchmark {i}; can be anything, for logging purpose only',
