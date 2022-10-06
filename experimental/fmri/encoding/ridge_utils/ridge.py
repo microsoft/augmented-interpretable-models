@@ -1,7 +1,7 @@
 #import scipy
 import numpy as np
 import logging
-from ridge_utils.utils import mult_diag, counter
+from .utils import mult_diag, counter
 import random
 import itertools as itools
 

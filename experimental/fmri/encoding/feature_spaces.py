@@ -4,14 +4,15 @@ import numpy as np
 import json
 from os.path import join, dirname
 
-from ridge_utils.interpdata import lanczosinterp2D
-from ridge_utils.SemanticModel import SemanticModel
-from ridge_utils.dsutils import make_semantic_model, make_word_ds, make_phoneme_ds
-from ridge_utils.stimulus_utils import load_textgrids, load_simulated_trfiles
+from .ridge_utils.interpdata import lanczosinterp2D
+from .ridge_utils.SemanticModel import SemanticModel
+from .ridge_utils.dsutils import make_semantic_model, make_word_ds, make_phoneme_ds
+from .ridge_utils.stimulus_utils import load_textgrids, load_simulated_trfiles
 
-repo_dir = join(dirname(dirname(os.path.abspath(__file__))))
+repo_dir = '/home/chansingh/mntv1/deep-fMRI' # join(dirname(dirname(os.path.abspath(__file__))))
 em_data_dir = join(repo_dir, 'em_data')
 data_dir = join(repo_dir, 'data')
+results_dir = join(repo_dir, 'results')
 
 def get_story_wordseqs(stories):
 	grids = load_textgrids(stories, data_dir)

@@ -5,20 +5,22 @@ import numpy as np
 import logging
 logger = logging.getLogger("SemanticModel")
 
+
 class SemanticModel(object):
     """This class defines a semantic vector-space model based on HAL or LSA with some
     prescribed preprocessing pipeline.
-    
+
     It contains two important variables: vocab and data.
     vocab is a 1D list (or array) of words.
     data is a 2D array (features by words) of word-feature values.
     """
+
     def __init__(self, data, vocab):
         """Initializes a SemanticModel with the given [data] and [vocab].
         """
         self.data = data
         self.vocab = vocab
-    
+
     def get_ndim(self):
         """Returns the number of dimensions in this model.
         """
@@ -29,15 +31,15 @@ class SemanticModel(object):
         """Return {vocab: index} dictionary.
         """
         if "_vindex" not in dir(self):
-            self._vindex = dict([(v,i) for (i,v) in enumerate(self.vocab)])
+            self._vindex = dict([(v, i) for (i, v) in enumerate(self.vocab)])
         return self._vindex
     vindex = property(get_vindex)
 
     def __getitem__(self, word):
         """Returns the vector corresponding to the given [word].
         """
-        return self.data[:,self.vindex[word]]
-    
+        return self.data[:, self.vindex[word]]
+
     def load_root(self, rootfile, vocab):
         """Load the SVD-generated semantic vector space from [rootfile], assumed to be
         an HDF5 file.
@@ -53,34 +55,34 @@ class SemanticModel(object):
         """
         vtfile = open(rootfile)
         nrows, ncols = map(int, vtfile.readline().split())
-        Vt = np.zeros((nrows,ncols))
+        Vt = np.zeros((nrows, ncols))
         nrows_done = 0
         for row in vtfile:
-            Vt[nrows_done,:] = map(float, row.split())
+            Vt[nrows_done, :] = map(float, row.split())
             nrows_done += 1
 
         self.data = Vt
         self.vocab = vocab
-    
+
     def restrict_by_occurrence(self, min_rank=60, max_rank=60000):
         """Restricts the data to words that have an occurrence rank lower than
         [min_rank] and higher than [max_rank].
         """
         logger.debug("Restricting words by occurrence..")
         nwords = self.data.shape[1]
-        wordranks = np.argsort(np.argsort(self.data[0,:]))
-        goodwords = np.nonzero(np.logical_and((nwords-wordranks)>min_rank,
-                                              (nwords-wordranks)<max_rank))[0]
+        wordranks = np.argsort(np.argsort(self.data[0, :]))
+        goodwords = np.nonzero(np.logical_and((nwords-wordranks) > min_rank,
+                                              (nwords-wordranks) < max_rank))[0]
 
-        self.data = self.data[:,goodwords]
+        self.data = self.data[:, goodwords]
         self.vocab = [self.vocab[i] for i in goodwords]
         logger.debug("Done restricting words..")
 
     def pca_reduce(self, ndims):
         """Reduces the dimensionality of the vector-space using PCA.
         """
-        logger.debug("Reducing with PCA to %d dimensions"%ndims)
-        U,S,Vh = np.linalg.svd(self.data, full_matrices=False)
+        logger.debug("Reducing with PCA to %d dimensions" % ndims)
+        U, S, Vh = np.linalg.svd(self.data, full_matrices=False)
         self.data = np.dot(Vh[:ndims].T, np.diag(S[:ndims])).T
         logger.debug("Done with PCA..")
 
@@ -88,12 +90,12 @@ class SemanticModel(object):
         """Reduces the dimensionality of the vector-space using PCA for many
         different numbers of dimensions.  More efficient than running
         pca_reduce many times.
-        
+
         Instead of modifying this object, this function returns a list of new
         SemanticModels with the specified numbers of dimensions.
         """
         logger.debug("Reducing with PCA to fewer dimensions..")
-        U,S,Vh = np.linalg.svd(self.data, full_matrices=False)
+        U, S, Vh = np.linalg.svd(self.data, full_matrices=False)
         newmodels = []
         for nd in ndimlist:
             newmodel = SemanticModel()
@@ -101,11 +103,11 @@ class SemanticModel(object):
             newmodel.data = np.dot(Vh[:nd].T, np.diag(S[:nd])).T
             newmodels.append(newmodel)
         return newmodels
-    
+
     def save(self, filename):
         """Saves this semantic model at the given filename.
         """
-        logger.debug("Saving file: %s"%filename)
+        logger.debug("Saving file: %s" % filename)
         shf = tables.open_file(filename, mode="w", title="SemanticModel")
         shf.createArray("/", "data", self.data)
         shf.createArray("/", "vocab", self.vocab)
@@ -116,7 +118,7 @@ class SemanticModel(object):
     def load(cls, filename):
         """Loads a semantic model from the given filename.
         """
-        logger.debug("Loading file: %s"%filename)
+        logger.debug("Loading file: %s" % filename)
         shf = tables.open_file(filename)
 
         newsm = cls(None, None)
@@ -125,7 +127,7 @@ class SemanticModel(object):
         shf.close()
         logger.debug("Done loading file..")
         return newsm
-    
+
     def copy(self):
         """Returns a copy of this model.
         """
@@ -152,7 +154,7 @@ class SemanticModel(object):
                     pstim[t] += self[w]
                 else:
                     dropped += 1
-            
+            # print('dropped', dropped, '/', len(stimwords[t]))
             pstim[t] /= (len(stimwords[t])-dropped)
 
         return pstim
@@ -164,7 +166,7 @@ class SemanticModel(object):
         R = np.zeros_like(self.data).astype(np.uint32)
         for ri in range(self.data.shape[0]):
             R[ri] = np.argsort(np.argsort(self.data[ri]))
-        
+
         self.data = R.astype(np.float64)
         logger.debug("Done uniformizing...")
 
@@ -182,23 +184,24 @@ class SemanticModel(object):
         if axis is None:
             logger.debug("Not Z-scoring..")
             return
-        
-        logger.debug("Z-scoring on axis %d"%axis)
-        if axis==1:
+
+        logger.debug("Z-scoring on axis %d" % axis)
+        if axis == 1:
             self.data = zscore(self.data.T).T
-        elif axis==0:
+        elif axis == 0:
             self.data = zscore(self.data)
-    
+
     def rectify(self):
         """Rectifies the features.
         """
-        self.data = np.vstack([-np.clip(self.data, -np.inf, 0), np.clip(self.data, 0, np.inf)])
-    
+        self.data = np.vstack(
+            [-np.clip(self.data, -np.inf, 0), np.clip(self.data, 0, np.inf)])
+
     def clip(self, sds):
         """Clips feature values more than [sds] standard deviations away from the mean
         to that value.  Another method for dealing with outliers.
         """
-        logger.debug("Truncating features to %d SDs.."%sds)
+        logger.debug("Truncating features to %d SDs.." % sds)
         fsds = self.data.std(1)
         fms = self.data.mean(1)
         newdata = np.zeros(self.data.shape)
@@ -213,20 +216,23 @@ class SemanticModel(object):
     def find_words_like_word(self, word, n=10):
         """Finds the [n] words most like the given [word].
         """
-        return self.find_words_like_vec(self.data[:,self.vocab.index(word)], n)
+        return self.find_words_like_vec(self.data[:, self.vocab.index(word)], n)
 
     def find_words_like_vec(self, vec, n=10, corr=True):
         """Finds the [n] words most like the given [vector].
         """
         nwords = len(self.vocab)
         if corr:
-            corrs = np.nan_to_num([np.corrcoef(vec, self.data[:,wi])[1,0] for wi in range(nwords)])
+            corrs = np.nan_to_num([np.corrcoef(vec, self.data[:, wi])[
+                                  1, 0] for wi in range(nwords)])
             scorrs = np.argsort(corrs)
-            words = list(reversed([(corrs[i], self.vocab[i]) for i in scorrs[-n:]]))
+            words = list(reversed([(corrs[i], self.vocab[i])
+                         for i in scorrs[-n:]]))
         else:
             proj = np.nan_to_num(np.dot(vec, self.data))
             sproj = np.argsort(proj)
-            words = list(reversed([(proj[i], self.vocab[i]) for i in sproj[-n:]]))
+            words = list(reversed([(proj[i], self.vocab[i])
+                         for i in sproj[-n:]]))
         return words
 
     def find_words_like_vecs(self, vecs, n=10, corr=True, distance_cull=None):
@@ -252,7 +258,8 @@ class SemanticModel(object):
         if distance_cull is None:
             return vocarr[np.argsort(proj)[-n:][::-1]]
         elif not isinstance(distance_cull, int):
-            raise TypeError("distance_cull should be an integer value, not %s" % str(distance_cull))
+            raise TypeError(
+                "distance_cull should be an integer value, not %s" % str(distance_cull))
 
         poss_set = set(self.vocab)
         poss_set = np.arange(len(self.vocab))
@@ -263,30 +270,32 @@ class SemanticModel(object):
             # Add word to best_words
             best_words.append(self.vocab[best_poss])
             # Remove nearby words (by L2-norm..?)
-            bwdists = ((self.data.T - self.data[:,best_poss])**2).sum(1)
+            bwdists = ((self.data.T - self.data[:, best_poss])**2).sum(1)
             nearest_inds = np.argsort(bwdists)[:distance_cull+1]
             poss_set = np.setdiff1d(poss_set, nearest_inds)
 
         return np.array(best_words)
-    
+
     def similarity(self, word1, word2):
         """Returns the correlation between the vectors for [word1] and [word2].
         """
-        return np.corrcoef(self.data[:,self.vocab.index(word1)], self.data[:,self.vocab.index(word2)])[0,1]
+        return np.corrcoef(self.data[:, self.vocab.index(word1)], self.data[:, self.vocab.index(word2)])[0, 1]
 
     def print_best_worst(self, ii, n=10):
         vector = self.data[ii]
         sv = np.argsort(self.data[ii])
         print("Best:")
         print("-------------")
-        for ni in range(1,n+1):
-            print("%s: %0.08f"%(np.array(self.vocab)[sv[-ni]], vector[sv[-ni]]))
-            
+        for ni in range(1, n+1):
+            print("%s: %0.08f" %
+                  (np.array(self.vocab)[sv[-ni]], vector[sv[-ni]]))
+
         print("\nWorst:")
         print("-------------")
         for ni in range(n):
-            print("%s: %0.08f"%(np.array(self.vocab)[sv[ni]], vector[sv[ni]]))
-            
+            print("%s: %0.08f" %
+                  (np.array(self.vocab)[sv[ni]], vector[sv[ni]]))
+
         print("\n")
 
 
@@ -299,12 +308,14 @@ def gaussianize(vec):
     zvals = vals/vals.std()
     return zvals
 
+
 def gaussianize_mat(mat):
     """Gaussianizes each column of [mat]."""
     gmat = np.empty(mat.shape)
     for ri in range(mat.shape[1]):
-        gmat[:,ri] = gaussianize(mat[:,ri])
+        gmat[:, ri] = gaussianize(mat[:, ri])
     return gmat
+
 
 def zscore(mat, return_unzvals=False):
     """Z-scores the rows of [mat] by subtracting off the mean and dividing
@@ -315,11 +326,11 @@ def zscore(mat, return_unzvals=False):
     zmat = np.empty(mat.shape)
     unzvals = np.zeros((zmat.shape[0], 2))
     for ri in range(mat.shape[0]):
-        unzvals[ri,0] = np.std(mat[ri,:])
-        unzvals[ri,1] = np.mean(mat[ri,:])
-        zmat[ri,:] = (mat[ri,:]-unzvals[ri,1]) / (1e-10+unzvals[ri,0])
-    
+        unzvals[ri, 0] = np.std(mat[ri, :])
+        unzvals[ri, 1] = np.mean(mat[ri, :])
+        zmat[ri, :] = (mat[ri, :]-unzvals[ri, 1]) / (1e-10+unzvals[ri, 0])
+
     if return_unzvals:
         return zmat, unzvals
-    
+
     return zmat

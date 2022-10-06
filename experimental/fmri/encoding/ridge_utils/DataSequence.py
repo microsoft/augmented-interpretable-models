@@ -1,6 +1,6 @@
 import numpy as np
 import itertools as itools
-from ridge_utils.interpdata import sincinterp2D, gabor_xfm2D, lanczosinterp2D
+from .interpdata import sincinterp2D, gabor_xfm2D, lanczosinterp2D
 
 class DataSequence(object):
     """DataSequence class provides a nice interface for handling data that is both continuous

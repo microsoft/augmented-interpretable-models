@@ -8,10 +8,10 @@ import pathlib
 from os.path import join, dirname
 import logging
 
-from encoding_utils import *
-from feature_spaces import _FEATURE_CONFIG, get_feature_space
-from ridge_utils.ridge import bootstrap_ridge
-from feature_spaces import repo_dir, em_data_dir, data_dir
+from .encoding_utils import *
+from .feature_spaces import _FEATURE_CONFIG, get_feature_space
+from .ridge_utils.ridge import bootstrap_ridge
+from .feature_spaces import repo_dir, em_data_dir, data_dir
 
 
 
@@ -50,7 +50,7 @@ if __name__ == "__main__":
 	assert len(set(train_stories) & set(test_stories)) == 0, "Train - Test overlap!"
 	allstories = list(set(train_stories) | set(test_stories))
 
-	save_location = join(repo_dir, "results", feature, subject)
+	save_location = join(results_dir, feature, subject)
 	print("Saving encoding model & results to:", save_location)
 	os.makedirs(save_location, exist_ok=True)
 
