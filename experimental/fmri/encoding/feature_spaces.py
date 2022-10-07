@@ -47,10 +47,6 @@ def downsample_word_vectors(stories, word_vectors, wordseqs):
 			wordseqs[story].tr_times, window=3)
 	return downsampled_semanticseqs
 
-###########################################
-########## ARTICULATORY Features ##########
-###########################################
-
 def ph_to_articulate(ds, ph_2_art):
 	""" Following make_phoneme_ds converts the phoneme DataSequence object to an 
 	articulate Datasequence for each grid.
@@ -97,10 +93,6 @@ def get_articulation_vectors(allstories):
 	return downsampled_arthistseqs
 
 
-###########################################
-########## PHONEME RATE Features ##########
-###########################################
-
 def get_phonemerate_vectors(allstories):
 	"""Get downsampled phonemerate vectors for specified stories.
 	Args:
@@ -123,10 +115,6 @@ def get_phonemerate_vectors(allstories):
 			phonemerate, arthistseq[2], arthistseq[3])
 	return downsampled_arthistseqs
 
-########################################
-########## WORD RATE Features ##########
-########################################
-
 def get_wordrate_vectors(allstories):
 	"""Get wordrate vectors for specified stories.
 
@@ -144,10 +132,6 @@ def get_wordrate_vectors(allstories):
 		vectors[story] = np.ones([nwords, 1])
 	return downsample_word_vectors(allstories, vectors, wordseqs)
 
-
-######################################
-########## ENG1000 Features ##########
-######################################
 
 def get_eng1000_vectors(allstories):
 	"""Get Eng1000 vectors (985-d) for specified stories.

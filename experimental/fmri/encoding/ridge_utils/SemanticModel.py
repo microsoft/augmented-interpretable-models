@@ -155,7 +155,8 @@ class SemanticModel(object):
                 else:
                     dropped += 1
             # print('dropped', dropped, '/', len(stimwords[t]))
-            pstim[t] /= (len(stimwords[t])-dropped)
+            if len(stimwords[t]) > dropped:
+                pstim[t] /= (len(stimwords[t])-dropped)
 
         return pstim
 
