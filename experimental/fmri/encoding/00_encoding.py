@@ -8,17 +8,17 @@ import pathlib
 from os.path import join, dirname
 import logging
 
-from .encoding_utils import *
-from .feature_spaces import _FEATURE_CONFIG, get_feature_space
-from .ridge_utils.ridge import bootstrap_ridge
-from .feature_spaces import repo_dir, em_data_dir, data_dir
+# from .encoding_utils import *
+import encoding_utils
+from feature_spaces import _FEATURE_CONFIG, get_feature_space, repo_dir, em_data_dir, data_dir, results_dir
+from ridge_utils.ridge import bootstrap_ridge
 
 
 
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser()
-	parser.add_argument("--subject", type=str, required=True)
-	parser.add_argument("--feature", type=str, required=True)
+	parser.add_argument("--subject", type=str, default='UTS03')
+	parser.add_argument("--feature", type=str, default='glove')
 	parser.add_argument("--sessions", nargs='+', type=int, default=[1, 2, 3, 4, 5])
 	parser.add_argument("--trim", type=int, default=5)
 	parser.add_argument("--ndelays", type=int, default=4)
@@ -59,15 +59,15 @@ if __name__ == "__main__":
 	print("trim: %d, ndelays: %d" % (trim, ndelays))
 
 	# Delayed stimulus
-	delRstim = apply_zscore_and_hrf(train_stories, downsampled_feat, trim, ndelays)
+	delRstim = encoding_utils.apply_zscore_and_hrf(train_stories, downsampled_feat, trim, ndelays)
 	print("delRstim: ", delRstim.shape)
-	delPstim = apply_zscore_and_hrf(test_stories, downsampled_feat, trim, ndelays)
+	delPstim = encoding_utils.apply_zscore_and_hrf(test_stories, downsampled_feat, trim, ndelays)
 	print("delPstim: ", delPstim.shape)
 
 	# Response
-	zRresp = get_response(train_stories, subject)
+	zRresp = encoding_utils.get_response(train_stories, subject)
 	print("zRresp: ", zRresp.shape)
-	zPresp = get_response(test_stories, subject)
+	zPresp = encoding_utils.get_response(test_stories, subject)
 	print("zPresp: ", zPresp.shape)
 
 	# Ridge

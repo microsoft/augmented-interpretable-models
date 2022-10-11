@@ -2,16 +2,17 @@ import datasets
 import numpy as np
 import os
 from os.path import join
-from encoding.ridge_utils.SemanticModel import SemanticModel
+from ridge_utils.SemanticModel import SemanticModel
 from matplotlib import pyplot as plt
 from typing import List
 from sklearn.linear_model import RidgeCV, LogisticRegressionCV
 from sklearn.feature_extraction.text import CountVectorizer
-from encoding.feature_spaces import em_data_dir, data_dir, results_dir
+from feature_spaces import em_data_dir, data_dir, results_dir, nlp_utils_dir
 from collections import defaultdict
 import pandas as pd
 import pickle as pkl
 from sklearn import metrics
+from copy import deepcopy
 
 def get_dsets(dataset):
     
@@ -47,18 +48,21 @@ def get_dsets(dataset):
     y_test = dset_test[dataset_key_label]
     return X, y, X_test, y_test
 
-def get_vecs(X: List[str]) -> np.ndarray:
-    eng1000 = SemanticModel.load(join(em_data_dir, 'english1000sm.hf5'))
+def get_vecs(X: List[str], model='eng1000') -> np.ndarray:
+    if 'eng1000' in model:
+        sm = SemanticModel.load(join(em_data_dir, 'english1000sm.hf5'))
+    elif 'glove' in model:
+        sm = SemanticModel.load_np(join(nlp_utils_dir, 'glove'))
     # extract features
     X = [
         [word.encode('utf-8') for word in sentence.split(' ')]
         for sentence in X
     ]
-    feats = eng1000.project_stims(X)
+    feats = sm.project_stims(X)
     return feats
 
-def get_embs_fmri(X: List[str], save_dir_fmri, perc_threshold=98) -> np.ndarray:
-    feats = get_vecs(X)
+def get_embs_fmri(X: List[str], model, save_dir_fmri, perc_threshold=98) -> np.ndarray:
+    feats = get_vecs(X, model=model)
     weights_npz = np.load(join(save_dir_fmri, 'weights.npz'))
     corrs_val = np.load(join(save_dir_fmri, 'corrs.npz'))['arr_0']
     
@@ -85,34 +89,47 @@ def get_bow_vecs(X: List[str], X_test: List[str]):
 
 if __name__ == '__main__':
     dsets = ['trec', 'emotion', 'rotten_tomatoes', 'tweet_eval', 'sst2']
+    models = ['glovevecs', 'eng1000vecs', 'eng1000fmri', 'bow'] # 'glovefmri'
     seed = 1
     perc_threshold_fmri = 98
-    save_dir_fmri = join(results_dir, 'eng1000', 'UTS03')
-    save_dir = '/home/chansingh/mntv1/deep-fMRI/results/linear_models'
+    save_dir = '/home/chansingh/mntv1/deep-fMRI/results/linear_models/oct10'
     os.makedirs(save_dir, exist_ok=True)
     
     
     for dset in dsets:
+        np.random.seed(seed)
         X, y, X_test, y_test = get_dsets(dset)
         print('shapes', len(X), len(X_test))
         
-        r = defaultdict(list)
-        for k in ['eng1000vecs', 'eng1000fmri', 'bow']:
-            print('computing', k)
-            if k == 'eng1000vecs':
-                feats_train = get_vecs(X)
-                feats_test = get_vecs(X_test)
-            elif k == 'eng1000fmri':
-                feats_train = get_embs_fmri(X, save_dir_fmri, perc_threshold=perc_threshold_fmri)
-                feats_test = get_embs_fmri(X_test, save_dir_fmri, perc_threshold=perc_threshold_fmri) 
-            elif k == 'bow':
+        
+        for model in models :
+            np.random.seed(seed)
+            print('computing model using', model)
+            r = defaultdict(list)
+
+            # get feats
+            if model in ['eng1000vecs', 'glovevecs']:
+                feats_train = get_vecs(X, model=model)
+                feats_test = get_vecs(X_test, model=model)
+            elif model in ['eng1000fmri', 'glovefmri']:
+                if model == 'eng1000fmri':
+                    save_dir_fmri = join(results_dir, 'eng1000', 'UTS03')
+                elif model == 'glovefmri':
+                    save_dir_fmri = join(results_dir, 'glove', 'UTS03')
+                feats_train = get_embs_fmri(X, model, save_dir_fmri, perc_threshold=perc_threshold_fmri)
+                feats_test = get_embs_fmri(X_test, model, save_dir_fmri, perc_threshold=perc_threshold_fmri) 
+            elif model == 'bow':
                 feats_train, feats_test = get_bow_vecs(X, X_test)
 
+            # fit model
             m = LogisticRegressionCV(random_state=seed, cv=3)
             m.fit(feats_train, y)
-            r['feats'].append(k)
+
+            # save stuff
+            r['feats'].append(model)
             r['acc'].append(m.score(feats_test, y_test))
             # r['roc_auc'].append(metrics.roc_auc_score(y_test, m.predict(feats_test)))
             r['feats_dim'].append(feats_train.shape[1])
-        df = pd.DataFrame.from_dict(r).set_index('feats')
-        df.to_pickle(join(save_dir, dset + '.pkl'))
+            r['coef_'].append(deepcopy(m))
+            df = pd.DataFrame.from_dict(r).set_index('feats')
+            df.to_pickle(join(save_dir, f'{dset}_{model}.pkl'))

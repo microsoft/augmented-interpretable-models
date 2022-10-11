@@ -4,12 +4,13 @@ import numpy as np
 import json
 from os.path import join, dirname
 
-from .ridge_utils.interpdata import lanczosinterp2D
-from .ridge_utils.SemanticModel import SemanticModel
-from .ridge_utils.dsutils import make_semantic_model, make_word_ds, make_phoneme_ds
-from .ridge_utils.stimulus_utils import load_textgrids, load_simulated_trfiles
+from ridge_utils.interpdata import lanczosinterp2D
+from ridge_utils.SemanticModel import SemanticModel
+from ridge_utils.dsutils import make_semantic_model, make_word_ds, make_phoneme_ds
+from ridge_utils.stimulus_utils import load_textgrids, load_simulated_trfiles
 
 repo_dir = '/home/chansingh/mntv1/deep-fMRI' # join(dirname(dirname(os.path.abspath(__file__))))
+nlp_utils_dir = '/home/chansingh/nlp_utils'
 em_data_dir = join(repo_dir, 'em_data')
 data_dir = join(repo_dir, 'data')
 results_dir = join(repo_dir, 'results')
@@ -150,6 +151,23 @@ def get_eng1000_vectors(allstories):
 		vectors[story] = sm.data
 	return downsample_word_vectors(allstories, vectors, wordseqs)
 
+def get_glove_vectors(allstories):
+	"""Get glove vectors (300-d) for specified stories.
+
+	Args:
+		allstories: List of stories to obtain vectors for.
+
+	Returns:
+		Dictionary of {story: downsampled vectors}
+	"""
+	glove = SemanticModel.load_np(join(nlp_utils_dir, 'glove'))
+	wordseqs = get_story_wordseqs(allstories)
+	vectors = {}
+	for story in allstories:
+		sm = make_semantic_model(wordseqs[story], [glove], [300])
+		vectors[story] = sm.data
+	return downsample_word_vectors(allstories, vectors, wordseqs)
+
 ############################################
 ########## Feature Space Creation ##########
 ############################################
@@ -159,6 +177,7 @@ _FEATURE_CONFIG = {
 	"phonemerate": get_phonemerate_vectors,
 	"wordrate": get_wordrate_vectors,
 	"eng1000": get_eng1000_vectors,
+	'glove': get_glove_vectors,
 }
 
 def get_feature_space(feature, *args):

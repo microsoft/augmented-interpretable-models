@@ -1,7 +1,7 @@
 import tables
 import pickle
 import numpy as np
-
+from os.path import join
 import logging
 logger = logging.getLogger("SemanticModel")
 
@@ -127,6 +127,21 @@ class SemanticModel(object):
         shf.close()
         logger.debug("Done loading file..")
         return newsm
+
+    @classmethod
+    def load_np(cls, embs_np_dir):
+        """
+        Added to work with custom embeddings
+        Loads a semantic model from the given vectors
+        """
+        vocab = np.load(open(join(embs_np_dir, 'vocab_npa.npy'), 'rb'))
+        embs = np.load(open(join(embs_np_dir, 'embs_npa.npy'), 'rb'))
+        newsm = cls(None, None)
+        newsm.data = embs.transpose()
+        newsm.vocab = [str.encode(v) for v in vocab]
+        logger.debug("Done loading file..")
+        return newsm
+
 
     def copy(self):
         """Returns a copy of this model.
