@@ -89,7 +89,7 @@ def get_bow_vecs(X: List[str], X_test: List[str]):
 
 if __name__ == '__main__':
     dsets = ['trec', 'emotion', 'rotten_tomatoes', 'tweet_eval', 'sst2']
-    models = ['glovevecs', 'eng1000vecs', 'eng1000fmri', 'bow'] # 'glovefmri'
+    models = ['glovefmri'] #, 'glovevecs', 'eng1000vecs', 'eng1000fmri', 'bow'] # 'glovefmri'
     seed = 1
     perc_threshold_fmri = 98
     save_dir = '/home/chansingh/mntv1/deep-fMRI/results/linear_models/oct10'
@@ -126,6 +126,7 @@ if __name__ == '__main__':
             m.fit(feats_train, y)
 
             # save stuff
+            r['dset'].append(dset)
             r['feats'].append(model)
             r['acc'].append(m.score(feats_test, y_test))
             # r['roc_auc'].append(metrics.roc_auc_score(y_test, m.predict(feats_test)))

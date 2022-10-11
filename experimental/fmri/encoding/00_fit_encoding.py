@@ -17,7 +17,7 @@ from ridge_utils.ridge import bootstrap_ridge
 
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser()
-	parser.add_argument("--subject", type=str, default='UTS03')
+	parser.add_argument("--subject", type=str, default='UTS01')
 	parser.add_argument("--feature", type=str, default='glove')
 	parser.add_argument("--sessions", nargs='+', type=int, default=[1, 2, 3, 4, 5])
 	parser.add_argument("--trim", type=int, default=5)
