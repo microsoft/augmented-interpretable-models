@@ -8,8 +8,6 @@ import argparse
 
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser()
-	parser.add_argument("-download_preprocess", action="store_true",
-						help="download data to disk. If true downloads all preprocessed data.")
 	args = parser.parse_args()
 
 	current_path = pathlib.Path(__file__).parent.resolve()
@@ -22,6 +20,5 @@ if __name__ == "__main__":
 		data_dir = os.path.join(main_dir, "data")
 	os.chdir(data_dir)
 	os.system("datalad clone https://github.com/OpenNeuroDatasets/ds003020")
-	if args.download_preprocess == True:
-		os.chdir("ds003020")
-		os.system("datalad get derivative")
+	os.chdir("ds003020")
+	os.system("datalad get derivative")
