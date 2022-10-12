@@ -201,6 +201,7 @@ _FEATURE_CONFIG = {
 	'bert-3': partial(get_bert_vectors, ngram_size=3),
 	'bert-5': partial(get_bert_vectors, ngram_size=5),
 	'bert-10': partial(get_bert_vectors, ngram_size=10),
+	'bert-20': partial(get_bert_vectors, ngram_size=20),
 }
 
 def get_feature_space(feature, *args):

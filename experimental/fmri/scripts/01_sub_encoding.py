@@ -19,7 +19,7 @@ PARAMS_COUPLED_DICT = {}
 ##########################################
 PARAMS_SHARED_DICT = {
     # things to vary
-    'feature': ['bert-3', 'bert-5', 'bert-10'],
+    'feature': ['bert-20'], #['bert-3', 'bert-5', 'bert-10', 'bert-20'],
     'ndelays': [1, 2, 3, 4],
 
     # things to average over
@@ -34,5 +34,5 @@ ks_final, param_combos_final = submit_utils.combine_param_dicts(
 submit_utils.run_dicts(
     ks_final, param_combos_final,
     script_name='01_fit_encoding.py',
-    actually_run=False,
+    actually_run=True,
 )
