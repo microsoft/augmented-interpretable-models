@@ -5,6 +5,7 @@ import os
 from os.path import dirname
 from os.path import join as oj
 import sys
+import random
 
 repo_dir = dirname(dirname(os.path.abspath(__file__)))
 
@@ -42,7 +43,14 @@ def run_dicts(
         cmd_python: str ='python',
         script_name: str = '01_fit_encoding.py',
         actually_run: bool=True,
+        shuffle: bool=False,
+        reverse: bool=False,
     ):
+    if shuffle:
+        random.shuffle(param_combos_final)
+    if reverse:
+        param_combos_final = param_combos_final[::-1]
+
     for i in range(len(param_combos_final)):
         param_str = cmd_python + ' ' + \
             os.path.join(repo_dir, script_name + ' ')
