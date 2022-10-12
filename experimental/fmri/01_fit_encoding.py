@@ -30,6 +30,10 @@ if __name__ == "__main__":
 	parser.add_argument('--seed', type=int, default=1)
 	parser.add_argument("-use_corr", action="store_true")
 	parser.add_argument("-single_alpha", action="store_true")
+
+	# for faster testing
+	parser.add_argument('--save_dir', type=str, default=None)
+	parser.add_argument('-story_override', action='store_true', help='For fast testing -- whether to train/test only on the sloth story.')
 	logging.basicConfig(level=logging.INFO)
 
 
@@ -39,16 +43,24 @@ if __name__ == "__main__":
 
 	fs = " ".join(_FEATURE_CONFIG.keys())
 	assert args.feature in _FEATURE_CONFIG.keys(), "Available feature spaces:" + fs
-	assert np.amax(args.sessions) <= 5 and np.amin(args.sessions) >=1, "1 <= session <= 5"
-	train_stories, test_stories, allstories = encoding_utils.get_allstories(args.sessions)
+
+	if args.story_override:
+		train_stories = ['sloth']
+		test_stories = ['sloth']
+		allstories = ['sloth']
+	else:
+		assert np.amax(args.sessions) <= 5 and np.amin(args.sessions) >=1, "1 <= session <= 5"
+		train_stories, test_stories, allstories = encoding_utils.get_allstories(args.sessions)
 	
 
 	# set up saving....
 	def get_save_dir(results_dir, feature, subject, ndelays):
 		save_dir = join(results_dir, 'encoding', feature + f'__ndel={ndelays}', subject)
 		return save_dir
-
-	save_dir = get_save_dir(results_dir, args.feature, args.subject, args.ndelays)
+	if args.save_dir is not None:
+		save_dir = args.save_dir
+	else:
+		save_dir = get_save_dir(results_dir, args.feature, args.subject, args.ndelays)
 
 	print("Saving encoding model & results to:", save_dir)
 	os.makedirs(save_dir, exist_ok=True)

@@ -48,7 +48,7 @@ def get_dsets(dataset):
     y_test = dset_test[dataset_key_label]
     return X, y, X_test, y_test
 
-def get_vecs(X: List[str], model='eng1000') -> np.ndarray:
+def get_word_vecs(X: List[str], model='eng1000') -> np.ndarray:
     if 'eng1000' in model:
         sm = SemanticModel.load(join(em_data_dir, 'english1000sm.hf5'))
     elif 'glove' in model:
@@ -61,8 +61,23 @@ def get_vecs(X: List[str], model='eng1000') -> np.ndarray:
     feats = sm.project_stims(X)
     return feats
 
+def get_ngram_vecs(X: List[str], model='bert-3') -> np.ndarray:
+
+    sm = SemanticModel.load_np(join(nlp_utils_dir, 'glove'))
+    # extract features
+    X = [
+        [word.encode('utf-8') for word in sentence.split(' ')]
+        for sentence in X
+    ]
+    feats = sm.project_stims(X)
+    return feats
+
+
 def get_embs_fmri(X: List[str], model, save_dir_fmri, perc_threshold=98) -> np.ndarray:
-    feats = get_vecs(X, model=model)
+    if 'bert' in model:
+        feats = get_ngram_vecs(X, model=model)
+    else:
+        feats = get_word_vecs(X, model=model)
     weights_npz = np.load(join(save_dir_fmri, 'weights.npz'))
     corrs_val = np.load(join(save_dir_fmri, 'corrs.npz'))['arr_0']
     
@@ -70,7 +85,8 @@ def get_embs_fmri(X: List[str], model, save_dir_fmri, perc_threshold=98) -> np.n
     N_DELAYS = 4
     # pretty sure this is right, but might be switched...
     weights = weights.reshape(N_DELAYS, -1, feats.shape[-1]) 
-    # delays for coefs are not stored next to each other!! (see cell 25 file:///Users/chandan/Downloads/speechmodeltutorial-master/SpeechModelTutorial%20-%20Pre-run.html)
+    # delays for coefs are not stored next to each other!!
+    # (see cell 25 file:///Users/chandan/Downloads/speechmodeltutorial-master/SpeechModelTutorial%20-%20Pre-run.html)
     # weights = weights.reshape(-1, N_DELAYS, feats.shape[-1]) 
     weights = weights.mean(axis=0).squeeze() # mean over delays dimension...
     embs = feats @ weights.T
@@ -109,9 +125,9 @@ if __name__ == '__main__':
 
             # get feats
             if model in ['eng1000vecs', 'glovevecs']:
-                feats_train = get_vecs(X, model=model)
-                feats_test = get_vecs(X_test, model=model)
-            elif model in ['eng1000fmri', 'glovefmri']:
+                feats_train = get_word_vecs(X, model=model)
+                feats_test = get_word_vecs(X_test, model=model)
+            elif model.endswith('fmri'): # e.g. eng1000fmri, bert-3__ndel=2fmri
                 if model == 'eng1000fmri':
                     save_dir_fmri = join(results_dir, 'eng1000', 'UTS03')
                 elif model == 'glovefmri':
