@@ -36,5 +36,5 @@ submit_utils.run_dicts(
     script_name='02_fit_decoding.py',
     actually_run=True,
     shuffle=False,
-    reverse=True,
+    reverse=False,
 )

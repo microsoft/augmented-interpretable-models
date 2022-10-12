@@ -17,6 +17,7 @@ import pandas as pd
 import pickle as pkl
 from sklearn import metrics
 from copy import deepcopy
+import sys
 
 
 def get_dsets(dataset: str, seed: int = 1, subsample_frac: float = None):
@@ -134,8 +135,8 @@ def get_feats(model: str, X: List[str], X_test: List[str], args):
 
 
 def fit_decoding(
-    model, feats_train, y_train, feats_test, y_test,
-    fname_save, args):
+        model, feats_train, y_train, feats_test, y_test,
+        fname_save, args):
     np.random.seed(args.seed)
     r = defaultdict(list)
 
@@ -177,19 +178,20 @@ if __name__ == '__main__':
     for k in sorted(vars(args)):
         logger.info('\t' + k + ' ' + str(vars(args)[k]))
 
-    os.makedirs(args.save_dir, exist_ok=True)
-
-    # get data
-    X_train, y_train, X_test, y_test = get_dsets(
-        args.dset, seed=args.seed, subsample_frac=args.subsample_frac)
-    logging.info('computing model using ' + args.model)
-
-    # fit decoding
+    # check for caching
     fname_save = join(args.save_dir, f'{args.dset}_{args.model}.pkl')
     if os.path.exists(fname_save) and args.use_cache:
         logging.info('\nAlready ran ' + fname_save + '!')
         logging.info('Skipping :)!\n')
-    else:
-        feats_train, feats_test = get_feats(args.model, X_train, X_test, args)
-        fit_decoding(args.model, feats_train, y_train, feats_test, y_test, fname_save, args)
+        sys.exit(0)
+
+    # get data
+    X_train, y_train, X_test, y_test = get_dsets(
+        args.dset, seed=args.seed, subsample_frac=args.subsample_frac)
+
+    # fit decoding
+    os.makedirs(args.save_dir, exist_ok=True)
+    feats_train, feats_test = get_feats(args.model, X_train, X_test, args)
+    fit_decoding(args.model, feats_train, y_train,
+                 feats_test, y_test, fname_save, args)
     logging.info('Succesfully completed!')
