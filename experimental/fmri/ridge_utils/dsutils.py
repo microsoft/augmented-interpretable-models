@@ -2,6 +2,8 @@ import numpy as np
 import itertools as itools
 from .DataSequence import DataSequence
 import datasets
+from transformers.pipelines.pt_utils import KeyDataset
+
 DEFAULT_BAD_WORDS = frozenset(["sentence_start", "sentence_end", "br", "lg", "ls", "ns", "sp"])
 
 def make_word_ds(grids, trfiles, bad_words=DEFAULT_BAD_WORDS):
@@ -112,16 +114,23 @@ def apply_model_to_ngrams(ds: DataSequence, embedding_function, ngram_size: int=
         l = max(0, i - ngram_size)
         ngram = ' '.join(ds.data[l: i + 1])
         ngrams_list.append(ngram)
-    text = datasets.Dataset.from_dict({'text': ngrams_list})['text']
 
     # out_list is (batch_size, 1, (seq_len + 2), 768) -- BERT adds initial / final tokens
-    out_list = embedding_function(text)
+
+    def get_emb(x):
+        return {'emb': embedding_function(x['text'])}
+    text = datasets.Dataset.from_dict({'text': ngrams_list})
+    out_list = text.map(get_emb)['emb'] # embedding_function(text)
+    # out_list = embedding_function(KeyDataset(text, "text"))
 
     # convert to np array by averaging over len (can't just convert this since seq lens vary)
     # embs = np.array(out).squeeze().mean(axis=1)
     num_ngrams = len(out_list)
     dim_size = len(out_list[0][0][0])
     embs = np.zeros((num_ngrams, dim_size))
+    for i in range(num_ngrams):
+        embs[i] = np.mean(out_list[i], axis=1) # avg over seq_len dim
+
     return DataSequence(embs, ds.split_inds, ds.data_times, ds.tr_times)
 
 

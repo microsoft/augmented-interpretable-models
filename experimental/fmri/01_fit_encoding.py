@@ -20,7 +20,7 @@ if __name__ == "__main__":
 	parser.add_argument("--feature", type=str, default='bert-10')
 	parser.add_argument("--sessions", nargs='+', type=int, default=[1, 2, 3, 4, 5])
 	parser.add_argument("--trim", type=int, default=5)
-	parser.add_argument("--ndelays", type=int, default=1)
+	parser.add_argument("--ndelays", type=int, default=4)
 	parser.add_argument("--nboots", type=int, default=50)
 	parser.add_argument("--chunklen", type=int, default=40)
 	parser.add_argument("--nchunks", type=int, default=125)

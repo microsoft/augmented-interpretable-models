@@ -6,6 +6,7 @@ from os.path import join, dirname
 from functools import partial
 from ridge_utils.DataSequence import DataSequence
 from typing import Dict
+from tqdm import tqdm
 from ridge_utils.interpdata import lanczosinterp2D
 from ridge_utils.SemanticModel import SemanticModel
 from ridge_utils.dsutils import apply_model_to_ngrams, apply_model_to_words, make_word_ds, make_phoneme_ds
@@ -180,7 +181,7 @@ def get_bert_vectors(allstories, model='bert-base-uncased', ngram_size=5):
 	vectors = {}
 	
 	print('extracting bert vecs...')
-	for story in allstories:
+	for story in tqdm(allstories):
 		sm = apply_model_to_ngrams(wordseqs[story], pipe, ngram_size=ngram_size)
 		vectors[story] = sm.data
 	return downsample_word_vectors(allstories, vectors, wordseqs)
