@@ -7,6 +7,8 @@ import json
 import pathlib
 from os.path import join, dirname
 import logging
+import random
+import torch
 
 # from .encoding_utils import *
 import encoding_utils
@@ -25,6 +27,7 @@ if __name__ == "__main__":
 	parser.add_argument("--chunklen", type=int, default=40)
 	parser.add_argument("--nchunks", type=int, default=125)
 	parser.add_argument("--singcutoff", type=float, default=1e-10)
+	parser.add_argument('--seed', type=int, default=1)
 	parser.add_argument("-use_corr", action="store_true")
 	parser.add_argument("-single_alpha", action="store_true")
 	logging.basicConfig(level=logging.INFO)
@@ -32,6 +35,7 @@ if __name__ == "__main__":
 
 	args = parser.parse_args()
 	globals().update(args.__dict__)
+	print('args', vars(args))
 
 	fs = " ".join(_FEATURE_CONFIG.keys())
 	assert args.feature in _FEATURE_CONFIG.keys(), "Available feature spaces:" + fs
@@ -39,9 +43,15 @@ if __name__ == "__main__":
 	train_stories, test_stories, allstories = encoding_utils.get_allstories(args.sessions)
 	
 
-	save_location = join(results_dir, args.feature, args.subject)
-	print("Saving encoding model & results to:", save_location)
-	os.makedirs(save_location, exist_ok=True)
+	# set up saving....
+	def get_save_dir(results_dir, feature, subject, ndelays):
+		save_dir = join(results_dir, 'encoding', feature + f'__ndel={ndelays}', subject)
+		return save_dir
+
+	save_dir = get_save_dir(results_dir, args.feature, args.subject, args.ndelays)
+
+	print("Saving encoding model & results to:", save_dir)
+	os.makedirs(save_dir, exist_ok=True)
 
 	downsampled_feat = get_feature_space(args.feature, allstories)
 	print("Stimulus & Response parameters:")
@@ -62,6 +72,11 @@ if __name__ == "__main__":
 	# Ridge
 	alphas = np.logspace(1, 3, 10)
 
+	# Seed
+	np.random.seed(args.seed)
+	torch.manual_seed(args.seed)
+	random.seed(args.seed)
+
 	print("Ridge parameters:")
 	print("nboots: %d, chunklen: %d, nchunks: %d, single_alpha: %s, use_corr: %s" % (
 		args.nboots, args.chunklen, args.nchunks, args.single_alpha, args.use_corr))
@@ -72,9 +87,9 @@ if __name__ == "__main__":
 		use_corr=args.use_corr)
 
 	# Save regression results.
-	np.savez("%s/weights" % save_location, wt)
-	np.savez("%s/corrs" % save_location, corrs)
-	np.savez("%s/valphas" % save_location, valphas)
-	np.savez("%s/bscorrs" % save_location, bscorrs)
-	np.savez("%s/valinds" % save_location, np.array(valinds))
+	np.savez("%s/weights" % save_dir, wt)
+	np.savez("%s/corrs" % save_dir, corrs)
+	np.savez("%s/valphas" % save_dir, valphas)
+	np.savez("%s/bscorrs" % save_dir, bscorrs)
+	np.savez("%s/valinds" % save_dir, np.array(valinds))
 	print("Total r2: %d" % sum(corrs * np.abs(corrs)))
