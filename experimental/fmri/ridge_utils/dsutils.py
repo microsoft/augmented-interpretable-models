@@ -106,6 +106,7 @@ def apply_model_to_ngrams(ds: DataSequence, embedding_function, ngram_size: int=
     size
         size of resulting vectors from the embedding function model
     """
+    # get list of inputs (could convert to HF dataset to make faster...)
     ngrams_list = []
     for i in range(len(ds.data)):
         l = max(0, i - ngram_size)

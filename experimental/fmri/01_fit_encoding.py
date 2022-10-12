@@ -34,29 +34,29 @@ if __name__ == "__main__":
 	globals().update(args.__dict__)
 
 	fs = " ".join(_FEATURE_CONFIG.keys())
-	assert feature in _FEATURE_CONFIG.keys(), "Available feature spaces:" + fs
-	assert np.amax(sessions) <= 5 and np.amin(sessions) >=1, "1 <= session <= 5"
-	train_stories, test_stories, allstories = encoding_utils.get_allstories(sessions)
+	assert args.feature in _FEATURE_CONFIG.keys(), "Available feature spaces:" + fs
+	assert np.amax(args.sessions) <= 5 and np.amin(args.sessions) >=1, "1 <= session <= 5"
+	train_stories, test_stories, allstories = encoding_utils.get_allstories(args.sessions)
 	
 
-	save_location = join(results_dir, feature, subject)
+	save_location = join(results_dir, args.feature, args.subject)
 	print("Saving encoding model & results to:", save_location)
 	os.makedirs(save_location, exist_ok=True)
 
-	downsampled_feat = get_feature_space(feature, allstories)
+	downsampled_feat = get_feature_space(args.feature, allstories)
 	print("Stimulus & Response parameters:")
-	print("trim: %d, ndelays: %d" % (trim, ndelays))
+	print("trim: %d, ndelays: %d" % (args.trim, args.ndelays))
 
 	# Delayed stimulus
-	delRstim = encoding_utils.apply_zscore_and_hrf(train_stories, downsampled_feat, trim, ndelays)
+	delRstim = encoding_utils.apply_zscore_and_hrf(train_stories, downsampled_feat, args.trim, args.ndelays)
 	print("delRstim: ", delRstim.shape)
-	delPstim = encoding_utils.apply_zscore_and_hrf(test_stories, downsampled_feat, trim, ndelays)
+	delPstim = encoding_utils.apply_zscore_and_hrf(test_stories, downsampled_feat, args.trim, args.ndelays)
 	print("delPstim: ", delPstim.shape)
 
 	# Response
-	zRresp = encoding_utils.get_response(train_stories, subject)
+	zRresp = encoding_utils.get_response(train_stories, args.subject)
 	print("zRresp: ", zRresp.shape)
-	zPresp = encoding_utils.get_response(test_stories, subject)
+	zPresp = encoding_utils.get_response(test_stories, args.subject)
 	print("zPresp: ", zPresp.shape)
 
 	# Ridge
@@ -64,12 +64,12 @@ if __name__ == "__main__":
 
 	print("Ridge parameters:")
 	print("nboots: %d, chunklen: %d, nchunks: %d, single_alpha: %s, use_corr: %s" % (
-		nboots, chunklen, nchunks, single_alpha, use_corr))
+		args.nboots, args.chunklen, args.nchunks, args.single_alpha, args.use_corr))
 
 	wt, corrs, valphas, bscorrs, valinds = bootstrap_ridge(
-		delRstim, zRresp, delPstim, zPresp, alphas, nboots, chunklen, 
-		nchunks, singcutoff=singcutoff, single_alpha=single_alpha, 
-		use_corr=use_corr)
+		delRstim, zRresp, delPstim, zPresp, alphas, args.nboots, args.chunklen, 
+		args.nchunks, singcutoff=args.singcutoff, single_alpha=args.single_alpha, 
+		use_corr=args.use_corr)
 
 	# Save regression results.
 	np.savez("%s/weights" % save_location, wt)
