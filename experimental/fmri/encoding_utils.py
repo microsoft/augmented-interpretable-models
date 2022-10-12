@@ -5,10 +5,26 @@ import os
 import h5py
 from multiprocessing.pool import ThreadPool
 from os.path import join, dirname
+import json
+from typing import List
 
 from ridge_utils.npp import zscore, mcorr
 from ridge_utils.utils import make_delayed
 from feature_spaces import repo_dir, data_dir, em_data_dir
+
+def get_allstories(sessions=[1, 2, 3, 4, 5]) -> List[str]:
+	sessions = list(map(str, sessions))
+	with open(join(em_data_dir, "sess_to_story.json"), "r") as f:
+		sess_to_story = json.load(f) 
+	train_stories, test_stories = [], []
+	for sess in sessions:
+		stories, tstory = sess_to_story[sess][0], sess_to_story[sess][1]
+		train_stories.extend(stories)
+		if tstory not in test_stories:
+			test_stories.append(tstory)
+	assert len(set(train_stories) & set(test_stories)) == 0, "Train - Test overlap!"
+	allstories = list(set(train_stories) | set(test_stories))
+	return train_stories, test_stories, allstories
 
 def apply_zscore_and_hrf(stories, downsampled_feat, trim, ndelays):
 	"""Get (z-scored and delayed) stimulus for train and test stories.

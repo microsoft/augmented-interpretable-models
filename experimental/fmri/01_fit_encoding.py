@@ -14,11 +14,10 @@ from feature_spaces import _FEATURE_CONFIG, get_feature_space, repo_dir, em_data
 from ridge_utils.ridge import bootstrap_ridge
 
 
-
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser()
-	parser.add_argument("--subject", type=str, default='UTS01')
-	parser.add_argument("--feature", type=str, default='glove')
+	parser.add_argument("--subject", type=str, default='UTS03')
+	parser.add_argument("--feature", type=str, default='bert-10')
 	parser.add_argument("--sessions", nargs='+', type=int, default=[1, 2, 3, 4, 5])
 	parser.add_argument("--trim", type=int, default=5)
 	parser.add_argument("--ndelays", type=int, default=4)
@@ -37,18 +36,8 @@ if __name__ == "__main__":
 	fs = " ".join(_FEATURE_CONFIG.keys())
 	assert feature in _FEATURE_CONFIG.keys(), "Available feature spaces:" + fs
 	assert np.amax(sessions) <= 5 and np.amin(sessions) >=1, "1 <= session <= 5"
-
-	sessions = list(map(str, sessions))
-	with open(join(em_data_dir, "sess_to_story.json"), "r") as f:
-		sess_to_story = json.load(f) 
-	train_stories, test_stories = [], []
-	for sess in sessions:
-		stories, tstory = sess_to_story[sess][0], sess_to_story[sess][1]
-		train_stories.extend(stories)
-		if tstory not in test_stories:
-			test_stories.append(tstory)
-	assert len(set(train_stories) & set(test_stories)) == 0, "Train - Test overlap!"
-	allstories = list(set(train_stories) | set(test_stories))
+	train_stories, test_stories, allstories = encoding_utils.get_allstories(sessions)
+	
 
 	save_location = join(results_dir, feature, subject)
 	print("Saving encoding model & results to:", save_location)

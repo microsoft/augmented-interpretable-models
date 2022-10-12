@@ -2,12 +2,14 @@ import numpy as np
 import itertools as itools
 from .interpdata import sincinterp2D, gabor_xfm2D, lanczosinterp2D
 
+
 class DataSequence(object):
     """DataSequence class provides a nice interface for handling data that is both continuous
     and discretely chunked. For example, semantic projections of speech stimuli must be
     considered both at the level of single words (which are continuous throughout the stimulus)
     and at the level of TRs (which contain discrete chunks of words).
     """
+
     def __init__(self, data, split_inds, data_times=None, tr_times=None):
         """Initializes the DataSequence with the given [data] object (which can be any iterable)
         and a collection of [split_inds], which should be the indices where the data is split into
@@ -69,14 +71,14 @@ class DataSequence(object):
 
         [kwargs] are passed to the interpolation function.
         """
-        if interp=="sinc":
-            ## downsample using sinc filter
+        if interp == "sinc":
+            # downsample using sinc filter
             return sincinterp2D(self.data, self.data_times, self.tr_times, **kwargs)
-        elif interp=="lanczos":
-            ## downsample using Lanczos filter
+        elif interp == "lanczos":
+            # downsample using Lanczos filter
             return lanczosinterp2D(self.data, self.data_times, self.tr_times, **kwargs)
-        elif interp=="gabor":
-            ## downsample using Gabor filter
+        elif interp == "gabor":
+            # downsample using Gabor filter
             return np.abs(gabor_xfm2D(self.data.T, self.data_times, self.tr_times, **kwargs)).T
         else:
             dsize = self.data.shape[1]
@@ -84,14 +86,14 @@ class DataSequence(object):
             for ci, c in enumerate(self.chunks()):
                 if len(c):
                     outmat[ci] = np.vstack(c).sum(0)
-                    
+
             return outmat
 
     def copy(self):
         """Returns a copy of this DataSequence.
         """
         return DataSequence(list(self.data), self.split_inds.copy(), self.data_times, self.tr_times)
-    
+
     @classmethod
     def from_grid(cls, grid_transcript, trfile):
         """Creates a new DataSequence from a [grid_transript] and a [trfile].
@@ -99,17 +101,21 @@ class DataSequence(object):
         """
         data_entries = list(zip(*grid_transcript))[2]
         if isinstance(data_entries[0], str):
-            data = list(map(str.lower, list(zip(*grid_transcript))[2]))
+            data = list(map(
+                str.lower,
+                list(zip(*grid_transcript))[2]
+            ))
         else:
             data = data_entries
-        word_starts = np.array(list(map(float, list(zip(*grid_transcript))[0])))
+        word_starts = np.array(
+            list(map(float, list(zip(*grid_transcript))[0])))
         word_ends = np.array(list(map(float, list(zip(*grid_transcript))[1])))
         word_avgtimes = (word_starts + word_ends)/2.0
-        
+
         tr = trfile.avgtr
         trtimes = trfile.get_reltriggertimes()
-        
-        split_inds = [(word_starts<(t+tr)).sum() for t in trtimes][:-1]
+
+        split_inds = [(word_starts < (t+tr)).sum() for t in trtimes][:-1]
         return cls(data, split_inds, word_avgtimes, trtimes+tr/2.0)
 
     @classmethod
@@ -119,6 +125,7 @@ class DataSequence(object):
         """
         lens = list(map(len, chunks))
         split_inds = np.cumsum(lens)[:-1]
-        #data = reduce(list.__add__, map(list, chunks)) ## 2.26s for 10k 6-w chunks
-        data = list(itools.chain(*map(list, chunks))) ## 19.6ms for 10k 6-w chunks
+        # data = reduce(list.__add__, map(list, chunks)) ## 2.26s for 10k 6-w chunks
+        # 19.6ms for 10k 6-w chunks
+        data = list(itools.chain(*map(list, chunks)))
         return cls(data, split_inds)

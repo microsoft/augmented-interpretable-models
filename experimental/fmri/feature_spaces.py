@@ -3,11 +3,14 @@ import sys
 import numpy as np
 import json
 from os.path import join, dirname
-
+from functools import partial
+from ridge_utils.DataSequence import DataSequence
+from typing import Dict
 from ridge_utils.interpdata import lanczosinterp2D
 from ridge_utils.SemanticModel import SemanticModel
-from ridge_utils.dsutils import make_semantic_model, make_word_ds, make_phoneme_ds
+from ridge_utils.dsutils import apply_model_to_ngrams, apply_model_to_words, make_word_ds, make_phoneme_ds
 from ridge_utils.stimulus_utils import load_textgrids, load_simulated_trfiles
+from transformers import pipeline
 
 repo_dir = '/home/chansingh/mntv1/deep-fMRI' # join(dirname(dirname(os.path.abspath(__file__))))
 nlp_utils_dir = '/home/chansingh/nlp_utils'
@@ -15,7 +18,7 @@ em_data_dir = join(repo_dir, 'em_data')
 data_dir = join(repo_dir, 'data')
 results_dir = join(repo_dir, 'results')
 
-def get_story_wordseqs(stories):
+def get_story_wordseqs(stories) -> Dict[str, DataSequence]:
 	grids = load_textgrids(stories, data_dir)
 	with open(join(data_dir, "ds003020/derivative/respdict.json"), "r") as f:
 		respdict = json.load(f)
@@ -147,8 +150,9 @@ def get_eng1000_vectors(allstories):
 	wordseqs = get_story_wordseqs(allstories)
 	vectors = {}
 	for story in allstories:
-		sm = make_semantic_model(wordseqs[story], [eng1000], [985])
+		sm = apply_model_to_words(wordseqs[story], eng1000, 985)
 		vectors[story] = sm.data
+		print(sm.data.shape)
 	return downsample_word_vectors(allstories, vectors, wordseqs)
 
 def get_glove_vectors(allstories):
@@ -164,9 +168,24 @@ def get_glove_vectors(allstories):
 	wordseqs = get_story_wordseqs(allstories)
 	vectors = {}
 	for story in allstories:
-		sm = make_semantic_model(wordseqs[story], [glove], [300])
+		sm = apply_model_to_words(wordseqs[story], glove, 300)
 		vectors[story] = sm.data
 	return downsample_word_vectors(allstories, vectors, wordseqs)
+
+def get_bert_vectors(allstories, model='bert-base-uncased', ngram_size=5):
+	"""Get bert vectors
+	"""
+	pipe = pipeline("feature-extraction", model=model, device=0)
+	wordseqs = get_story_wordseqs(allstories)
+	vectors = {}
+	
+	print('extracting bert vecs...')
+	for story in allstories:
+		sm = apply_model_to_ngrams(wordseqs[story], pipe, ngram_size=ngram_size)
+		vectors[story] = sm.data
+	return downsample_word_vectors(allstories, vectors, wordseqs)
+
+
 
 ############################################
 ########## Feature Space Creation ##########
@@ -178,7 +197,13 @@ _FEATURE_CONFIG = {
 	"wordrate": get_wordrate_vectors,
 	"eng1000": get_eng1000_vectors,
 	'glove': get_glove_vectors,
+	'bert-3': partial(get_bert_vectors, ngram_size=3),
+	'bert-5': partial(get_bert_vectors, ngram_size=5),
+	'bert-10': partial(get_bert_vectors, ngram_size=10),
 }
 
 def get_feature_space(feature, *args):
 	return _FEATURE_CONFIG[feature](*args)
+
+if __name__ == '__main__':
+	feats = get_feature_space('bert-5', ['sloth'])

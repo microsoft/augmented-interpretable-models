@@ -78,28 +78,50 @@ def histogram_phonemes2(ds, phonemeset=phonemes):
     newdata = np.vstack([olddata==ph for ph in phonemeset]).T
     return DataSequence(newdata, ds.split_inds, ds.data_times, ds.tr_times)
 
-def make_semantic_model(ds: DataSequence, lsasms: list, sizes: list):
+def apply_model_to_words(ds: DataSequence, lsa_semantic_model, size: int) -> DataSequence:
     """
     ds
         datasequence to operate on
-    lsasms
-        semantic models to use
-    sizes
-        sizes of resulting vectors from each semantic model
+    lsa_semantic_model
+        semantic model to use
+    size
+        size of resulting vectors from the semantic model
     """
     newdata = []
-    num_lsasms = len(lsasms)
     for w in ds.data:
         v = []
-        for i in range(num_lsasms):
-            lsasm = lsasms[i]
-            size = sizes[i]
-            try:
-                v = np.concatenate((v, lsasm[str.encode(w.lower())]))
-            except KeyError as e:
-                v = np.concatenate((v, np.zeros((size)))) #lsasm.data.shape[0],))
+        try:
+            v = np.concatenate((v, lsa_semantic_model[str.encode(w.lower())]))
+        except KeyError as e:
+            v = np.concatenate((v, np.zeros((size)))) #lsasm.data.shape[0],))
         newdata.append(v)
     return DataSequence(np.array(newdata), ds.split_inds, ds.data_times, ds.tr_times)
+
+def apply_model_to_ngrams(ds: DataSequence, embedding_function, ngram_size: int=5) -> DataSequence:
+    """
+    ds
+        datasequence to operate on
+    embedding_function
+        ngram -> fixed size vector
+    size
+        size of resulting vectors from the embedding function model
+    """
+    ngrams_list = []
+    for i in range(len(ds.data)):
+        l = max(0, i - ngram_size)
+        ngram = ' '.join(ds.data[l: i + 1])
+        ngrams_list.append(ngram)
+
+    # out_list is (batch_size, 1, (seq_len + 2), 768) -- BERT adds initial / final tokens
+    out_list = embedding_function(ngrams_list)
+
+    # convert to np array by averaging over len (can't just convert this since seq lens vary)
+    # embs = np.array(out).squeeze().mean(axis=1)
+    num_ngrams = len(out_list)
+    dim_size = len(out_list[0][0][0])
+    embs = np.zeros((num_ngrams, dim_size))
+    return DataSequence(embs, ds.split_inds, ds.data_times, ds.tr_times)
+
 
 def make_character_model(dss):
     """Make character indicator model for a dict of datasequences.
