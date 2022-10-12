@@ -203,7 +203,6 @@ def get_eng1000_vectors(allstories):
     for story in allstories:
         sm = apply_model_to_words(wordseqs[story], eng1000, 985)
         vectors[story] = sm.data
-        print(sm.data.shape)
     return downsample_word_vectors(allstories, vectors, wordseqs)
 
 
