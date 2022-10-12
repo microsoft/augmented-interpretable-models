@@ -56,6 +56,6 @@ def run_dicts(
             f'\n\n-------------------{i + 1}/{len(param_combos_final)}--------------------\n' + param_str)
         try:
             if actually_run:
-                os.system(cmd_python)
+                os.system(param_str)
         except Exception as e:
             print(e)
