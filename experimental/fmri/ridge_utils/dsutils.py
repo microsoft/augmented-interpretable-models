@@ -1,7 +1,7 @@
 import numpy as np
 import itertools as itools
 from .DataSequence import DataSequence
-
+import datasets
 DEFAULT_BAD_WORDS = frozenset(["sentence_start", "sentence_end", "br", "lg", "ls", "ns", "sp"])
 
 def make_word_ds(grids, trfiles, bad_words=DEFAULT_BAD_WORDS):
@@ -112,9 +112,10 @@ def apply_model_to_ngrams(ds: DataSequence, embedding_function, ngram_size: int=
         l = max(0, i - ngram_size)
         ngram = ' '.join(ds.data[l: i + 1])
         ngrams_list.append(ngram)
+    text = datasets.Dataset.from_dict({'text': ngrams_list})['text']
 
     # out_list is (batch_size, 1, (seq_len + 2), 768) -- BERT adds initial / final tokens
-    out_list = embedding_function(ngrams_list)
+    out_list = embedding_function(text)
 
     # convert to np array by averaging over len (can't just convert this since seq lens vary)
     # embs = np.array(out).squeeze().mean(axis=1)
