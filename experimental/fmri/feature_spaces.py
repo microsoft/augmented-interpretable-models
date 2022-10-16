@@ -237,7 +237,7 @@ def get_bert_vectors(allstories, model='bert-base-uncased', ngram_size=5):
         embs = get_embs_from_text(
             ds.data, embedding_function=pipe, ngram_size=ngram_size)
         vectors[story] = DataSequence(
-            embs, ds.split_inds, ds.data_times, ds.tr_times)
+            embs, ds.split_inds, ds.data_times, ds.tr_times).data
     return downsample_word_vectors(allstories, vectors, wordseqs)
 
 

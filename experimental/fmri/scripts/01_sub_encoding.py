@@ -19,14 +19,14 @@ PARAMS_COUPLED_DICT = {}
 ##########################################
 PARAMS_SHARED_DICT = {
     # things to vary
-    'feature': ['bert-20'], #['bert-3', 'bert-5', 'bert-10', 'bert-20'],
-    'ndelays': [1, 2, 3, 4],
+    'feature': ['bert-3', 'bert-5', 'bert-10', 'bert-20'],
+    'ndelays': [6],
 
     # things to average over
     'seed': [1],
 
     # fixed params
-    'subject': ['UTS03', 'UTS01', 'UTS02'],
+    'subject': ['UTS03', 'UTS02', 'UTS01',], #'UTS03', 'UTS01', 'UTS02'],
 }
 
 ks_final, param_combos_final = submit_utils.combine_param_dicts(
