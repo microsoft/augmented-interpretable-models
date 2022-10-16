@@ -8,7 +8,7 @@ repo_dir = dirname(dirname(os.path.abspath(__file__)))
 
 PARAMS_COUPLED_DICT = {
     ('save_dir', 'subsample_frac'): [
-        # ('/home/chansingh/mntv1/deep-fMRI/results/linear_models/oct12', -1),
+        ('/home/chansingh/mntv1/deep-fMRI/results/linear_models/oct12', -1),
         ('/home/chansingh/mntv1/deep-fMRI/results/linear_models/subsamp_oct12', 0.1),
     ],
 }
@@ -17,16 +17,17 @@ PARAMS_COUPLED_DICT = {
 # params shared across everything (higher up things are looped over first)
 ##########################################
 PARAMS_SHARED_DICT = {
-    'save_dir': ['/home/chansingh/mntv1/deep-fMRI/results/linear_models/oct12'],
     # things to vary
-    'dset': ['trec', 'emotion', 'rotten_tomatoes', 'tweet_eval', 'sst2'],
+    'dset': ['sst2', 'tweet_eval', 'trec', 'emotion', 'rotten_tomatoes'],
     'model': [
-        'bert-10__ndel=4fmri', 'glove__ndel=4fmri', 'eng1000__ndel=4fmri',
-        'glovevecs', 'eng1000vecs', 'bowvecs',
+        'bert-base-uncased', #'bert-10__ndel=4fmri',
+        # 'glove__ndel=4fmri', 'eng1000__ndel=4fmri',
+        # 'glovevecs', 'eng1000vecs', 'bowvecs',
     ],
 
     # things to average over
     'seed': [1],
+    # 'save_dir': ['/home/chansingh/mntv1/deep-fMRI/results/linear_models/oct12'],
 }
 
 ks_final, param_combos_final = submit_utils.combine_param_dicts(

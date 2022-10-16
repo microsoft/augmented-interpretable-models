@@ -19,6 +19,7 @@ from sklearn import metrics
 from copy import deepcopy
 import sys
 
+from tqdm import tqdm
 
 def get_dsets(dataset: str, seed: int = 1, subsample_frac: float = None):
 
@@ -115,7 +116,33 @@ def get_bow_vecs(X: List[str], X_test: List[str]):
     return trans(X).todense(), trans(X_test).todense()
 
 
+def get_hf_embs(X: List[str], X_test: List[str], model: str):
+    pipe = pipeline("feature-extraction", model=model, device=0)
+
+    def get_llm_embs(examples: List[str]):
+        def get_emb(x):
+            return {'emb': pipe(x['text'])}
+        text = datasets.Dataset.from_dict({'text': examples})
+        out_list = text.map(get_emb)['emb']
+        # out_list is (batch_size, 1, (seq_len + 2), 768)
+
+        # convert to np array by averaging over len (can't just convert this since seq lens vary)
+        num_examples = len(out_list)
+        dim_size = len(out_list[0][0][0])
+        embs = np.zeros((num_examples, dim_size))
+        for i in tqdm(range(num_examples)):
+            embs[i] = np.mean(out_list[i], axis=1)  # avg over seq_len dim
+        return embs
+
+    logging.info('Training embs...')
+    feats_train = get_llm_embs(X)
+    logging.info('Testing embs...')
+    feats_test = get_llm_embs(X_test)
+    return feats_train, feats_test
+
+
 def get_feats(model: str, X: List[str], X_test: List[str], args):
+    logging.info('Extracting features for ' +  model)
     mod = model.replace('fmri', '').replace('vecs', '')
     if model.endswith('fmri'):
         save_dir_fmri = join(
@@ -131,6 +158,8 @@ def get_feats(model: str, X: List[str], X_test: List[str], args):
         elif mod in ['eng1000', 'glove']:
             feats_train = get_word_vecs(X, model=mod)
             feats_test = get_word_vecs(X_test, model=mod)
+    else: # HF checkpoint
+        feats_train, feats_test = get_hf_embs(X, X_test, model=mod)
     return feats_train, feats_test
 
 
@@ -162,7 +191,11 @@ if __name__ == '__main__':
     parser.add_argument('--seed', type=int, default=1)
     parser.add_argument('--perc_threshold_fmri', type=float, default=98)
     parser.add_argument("--save_dir", type=str, default='/home/chansingh/.tmp')
-    parser.add_argument('--model', type=str, default='glovevecs')
+    parser.add_argument('--model', type=str, default='bert-base-uncased',
+                        help='Which model to extract features with. \
+                            Ending in fmri uses model finetuned on fMRI. \
+                            Ending in vecs uses a word-vector model. \
+                            Otherwise uses HF checkpoint.')  # glovevecs, bert-10__ndel=4fmri
     parser.add_argument('--dset', type=str, default='rotten_tomatoes',
                         choices=['trec', 'emotion', 'rotten_tomatoes', 'tweet_eval', 'sst2'])
     parser.add_argument('--subsample_frac', type=float,
