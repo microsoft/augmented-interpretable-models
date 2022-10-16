@@ -171,7 +171,7 @@ def fit_decoding(
 
     # fit model
     logging.info('Fitting logistic...')
-    m = LogisticRegressionCV(random_state=args.seed, cv=3)
+    m = LogisticRegressionCV(random_state=args.seed, cv=3, refit=False)
     m.fit(feats_train, y_train)
 
     # save stuff
