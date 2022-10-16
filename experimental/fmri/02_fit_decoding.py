@@ -212,7 +212,7 @@ if __name__ == '__main__':
         logger.info('\t' + k + ' ' + str(vars(args)[k]))
 
     # check for caching
-    fname_save = join(args.save_dir, f'{args.dset}_{args.model}.pkl')
+    fname_save = join(args.save_dir, f'{args.dset}_{args.model}_seed={args.seed}.pkl')
     if os.path.exists(fname_save) and args.use_cache:
         logging.info('\nAlready ran ' + fname_save + '!')
         logging.info('Skipping :)!\n')
