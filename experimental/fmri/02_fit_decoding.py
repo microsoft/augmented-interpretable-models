@@ -172,8 +172,8 @@ def fit_decoding(
 
     # fit model
     logging.info('Fitting logistic...')
-    cv = StratifiedKFold(n_splits=3, shuffle=True, random_state=seed)
-    m = LogisticRegressionCV(random_state=seed, refit=False, cv=cv)
+    cv = StratifiedKFold(n_splits=3, shuffle=True, random_state=args.seed)
+    m = LogisticRegressionCV(random_state=args.seed, refit=False, cv=cv)
     # m = LogisticRegressionCV(random_state=args.seed, cv=3, refit=False)
     m.fit(feats_train, y_train)
 
