@@ -8,8 +8,8 @@ repo_dir = dirname(dirname(os.path.abspath(__file__)))
 
 PARAMS_COUPLED_DICT = {
     ('save_dir', 'subsample_frac'): [
-        ('/home/chansingh/mntv1/deep-fMRI/results/linear_models/oct16', -1),
-        ('/home/chansingh/mntv1/deep-fMRI/results/linear_models/subsamp_oct16', 0.1),
+        ('/home/chansingh/mntv1/deep-fMRI/results/linear_models/oct17', -1),
+        ('/home/chansingh/mntv1/deep-fMRI/results/linear_models/subsamp_oct17', 0.1),
     ],
 }
 
@@ -23,8 +23,8 @@ PARAMS_SHARED_DICT = {
     # things to vary
     'dset': ['rotten_tomatoes', 'sst2', 'tweet_eval', 'trec', 'emotion'],
     'model': [
-        'bert-base-uncased', 'bert-10__ndel=4fmri',
-        # 'glove__ndel=4fmri', 'glovevecs', 
+        # 'bert-base-uncased', 'bert-10__ndel=4fmri',
+        'glove__ndel=4fmri', 'glovevecs', 
         # 'eng1000__ndel=4fmri',
         # 'eng1000vecs', 'bowvecs',
     ],
@@ -36,6 +36,6 @@ submit_utils.run_dicts(
     ks_final, param_combos_final,
     script_name='02_fit_decoding.py',
     actually_run=True,
-    shuffle=True,
-    reverse=True,
+    shuffle=False,
+    reverse=False,
 )

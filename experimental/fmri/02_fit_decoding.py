@@ -4,6 +4,7 @@ import numpy as np
 import os
 from os.path import join
 import logging
+from sklearn.model_selection import StratifiedKFold
 from transformers import pipeline
 from ridge_utils.SemanticModel import SemanticModel
 from matplotlib import pyplot as plt
@@ -171,7 +172,9 @@ def fit_decoding(
 
     # fit model
     logging.info('Fitting logistic...')
-    m = LogisticRegressionCV(random_state=args.seed, cv=3, refit=False)
+    cv = StratifiedKFold(n_splits=3, shuffle=True, random_state=seed)
+    m = LogisticRegressionCV(random_state=seed, refit=False, cv=cv)
+    # m = LogisticRegressionCV(random_state=args.seed, cv=3, refit=False)
     m.fit(feats_train, y_train)
 
     # save stuff

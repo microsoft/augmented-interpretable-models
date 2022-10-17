@@ -2,6 +2,10 @@
 # mv glove.840B.300d.zip ~
 # cd ~
 # unzip glove.840B.300d.zip
+# mkdir nlp_utils
+# mkdir nlp_utils/glove
+# mv glove* nlp_utils/glove/
+
 from tqdm import tqdm
 import numpy as np
 from os.path import join
