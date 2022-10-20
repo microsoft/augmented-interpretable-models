@@ -4,12 +4,12 @@ import numpy as np
 import os
 from os.path import join
 import logging
-from sklearn.model_selection import StratifiedKFold
+from sklearn.model_selection import StratifiedKFold, GridSearchCV, train_test_split
 from transformers import pipeline
 from ridge_utils.SemanticModel import SemanticModel
 from matplotlib import pyplot as plt
 from typing import List
-from sklearn.linear_model import RidgeCV, LogisticRegressionCV
+from sklearn.linear_model import RidgeCV, LogisticRegressionCV, LogisticRegression
 from sklearn.feature_extraction.text import CountVectorizer
 from feature_spaces import em_data_dir, data_dir, results_dir, nlp_utils_dir
 import feature_spaces
@@ -166,24 +166,41 @@ def get_feats(model: str, X: List[str], X_test: List[str], args):
 
 def fit_decoding(
         model, feats_train, y_train, feats_test, y_test,
-        fname_save, args):
+        fname_save, args, frac_train_to_drop=0.1):
+    """Randomly fits to only 90% of training data
+    """
     np.random.seed(args.seed)
     r = defaultdict(list)
 
     # fit model
     logging.info('Fitting logistic...')
-    cv = StratifiedKFold(n_splits=3, shuffle=True, random_state=args.seed)
-    m = LogisticRegressionCV(random_state=args.seed, refit=False, cv=cv)
-    # m = LogisticRegressionCV(random_state=args.seed, cv=3, refit=False)
+
+    m = LogisticRegressionCV(random_state=args.seed, cv=3) 
+    if args.subsample_frac is None or args.subsample_frac < 0:
+        feats_train, feats_drop, y_train, y_drop = train_test_split(
+            feats_train, y_train, test_size=frac_train_to_drop, random_state=args.seed)
     m.fit(feats_train, y_train)
 
+    # cv = StratifiedKFold(n_splits=3, shuffle=True, random_state=args.seed)
+    # m = LogisticRegressionCV(random_state=args.seed, refit=True, cv=cv) # with refit, should get better performance but no variance
+    # param_grid = {'C': np.logspace(-4, 4, 10)}
+    # logistic = LogisticRegression(random_state=args.seed)
+
+    # we should do this eventually to get the best performance    
+    # m = GridSearchCV(logistic, param_grid, refit=False, cv=cv)
+    # m.fit(feats_train, y_train)
+    
+
     # save stuff
+    acc = m.score(feats_test, y_test)
+    print('acc', acc)
     r['dset'].append(args.dset)
     r['feats'].append(model)
-    r['acc'].append(m.score(feats_test, y_test))
+    r['acc'].append(acc)
     # r['roc_auc'].append(metrics.roc_auc_score(y_test, m.predict(feats_test)))
     r['feats_dim'].append(feats_train.shape[1])
     r['coef_'].append(deepcopy(m))
+    r['seed'].append(args.seed)
     df = pd.DataFrame.from_dict(r).set_index('feats')
     df.to_pickle(fname_save)
 
@@ -194,11 +211,11 @@ if __name__ == '__main__':
     parser.add_argument('--seed', type=int, default=1)
     parser.add_argument('--perc_threshold_fmri', type=float, default=98)
     parser.add_argument("--save_dir", type=str, default='/home/chansingh/.tmp')
-    parser.add_argument('--model', type=str, default='bert-base-uncased',
+    parser.add_argument('--model', type=str, default='glovevecs',
                         help='Which model to extract features with. \
                             Ending in fmri uses model finetuned on fMRI. \
                             Ending in vecs uses a word-vector model. \
-                            Otherwise uses HF checkpoint.')  # glovevecs, bert-10__ndel=4fmri
+                            Otherwise uses HF checkpoint.')  # glovevecs, bert-10__ndel=4fmri, bert-base-uncased
     parser.add_argument('--dset', type=str, default='rotten_tomatoes',
                         choices=['trec', 'emotion', 'rotten_tomatoes', 'tweet_eval', 'sst2'])
     parser.add_argument('--subsample_frac', type=float,
