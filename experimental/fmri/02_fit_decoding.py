@@ -22,6 +22,7 @@ import sys
 
 from tqdm import tqdm
 
+
 def get_dsets(dataset: str, seed: int = 1, subsample_frac: float = None):
 
     # select subsets
@@ -30,19 +31,26 @@ def get_dsets(dataset: str, seed: int = 1, subsample_frac: float = None):
     if dataset == 'tweet_eval':
         def get_dset():
             return datasets.load_dataset('tweet_eval', 'hate')
+    elif dataset == 'moral_stories':
+        def get_dset():
+            return datasets.load_dataset(
+                'demelin/moral_stories', 'cls-action+norm-minimal_pairs')
 
-    # print(get_dset())
-
-    # select data keys
+    # default keys
     dataset_key_text = 'text'
+    dataset_key_label = 'label'
+    val_dset_key = 'validation'
+
+    # changes
     if dataset == 'sst2':
         dataset_key_text = 'sentence'
-    dataset_key_label = 'label'
-    if dataset == 'trec':
-        dataset_key_label = 'label-coarse'
-    val_dset_key = 'validation'
-    if dataset == 'trec':
+    elif dataset == 'poem_sentiment':
+        dataset_key_text = 'verse_text'
+    elif dataset == 'trec':
+        dataset_key_label = 'coarse_label'  # 'label-coarse'
         val_dset_key = 'test'
+    elif dataset == 'go_emotions':
+        dataset_key_label = 'labels'
 
     dset = get_dset()['train']
     if subsample_frac is not None and subsample_frac > 0:
@@ -52,13 +60,37 @@ def get_dsets(dataset: str, seed: int = 1, subsample_frac: float = None):
                        size=int(len(dset) * subsample_frac),
                        replace=False)
         )
-    X = dset[dataset_key_text]
+
+    def remove_multilabel(X: List[str], y: List[List]):
+        idxs = np.array(pd.Series(y).apply(len) == 1)
+        X = np.array(X)[idxs].tolist()
+        y = np.array([yy[0] for yy in y])[idxs].tolist()
+        return X, y
+
+
+    def get_X(d, dataset_key_text, dataset):
+        if not dataset == 'moral_stories':
+            return d[dataset_key_text]
+        if dataset == 'moral_stories':
+            text = np.vstack((d['immoral_action'], d['moral_action'])).T
+            texts = []
+            idxs = np.array(d['label']).astype(int)
+            for i, idx in enumerate(tqdm(idxs)):
+                texts.append(d['norm'][i] + ' ' + text[i, idx])
+        return texts
+
+    X = get_X(dset, dataset_key_text, dataset)
     y = dset[dataset_key_label]
 
     dset_test = get_dset()[val_dset_key]
     # dset_test = dset_test.select(np.random.choice(len(dset_test), size=300, replace=False))
-    X_test = dset_test[dataset_key_text]
+    X_test = get_X(dset_test, dataset_key_text, dataset)
     y_test = dset_test[dataset_key_label]
+
+    if dataset == 'go_emotions':
+        X, y = remove_multilabel(X, y)
+        X_test, y_test = remove_multilabel(X_test, y_test)
+
     return X, y, X_test, y_test
 
 
@@ -143,7 +175,7 @@ def get_hf_embs(X: List[str], X_test: List[str], model: str):
 
 
 def get_feats(model: str, X: List[str], X_test: List[str], args):
-    logging.info('Extracting features for ' +  model)
+    logging.info('Extracting features for ' + model)
     mod = model.replace('fmri', '').replace('vecs', '')
     if model.endswith('fmri'):
         save_dir_fmri = join(
@@ -159,7 +191,7 @@ def get_feats(model: str, X: List[str], X_test: List[str], args):
         elif mod in ['eng1000', 'glove']:
             feats_train = get_word_vecs(X, model=mod)
             feats_test = get_word_vecs(X_test, model=mod)
-    else: # HF checkpoint
+    else:  # HF checkpoint
         feats_train, feats_test = get_hf_embs(X, X_test, model=mod)
     return feats_train, feats_test
 
@@ -175,7 +207,7 @@ def fit_decoding(
     # fit model
     logging.info('Fitting logistic...')
 
-    m = LogisticRegressionCV(random_state=args.seed, cv=3) 
+    m = LogisticRegressionCV(random_state=args.seed, cv=3)
     if args.subsample_frac is None or args.subsample_frac < 0:
         feats_train, feats_drop, y_train, y_drop = train_test_split(
             feats_train, y_train, test_size=frac_train_to_drop, random_state=args.seed)
@@ -186,14 +218,13 @@ def fit_decoding(
     # param_grid = {'C': np.logspace(-4, 4, 10)}
     # logistic = LogisticRegression(random_state=args.seed)
 
-    # we should do this eventually to get the best performance    
+    # we should do this eventually to get the best performance
     # m = GridSearchCV(logistic, param_grid, refit=False, cv=cv)
     # m.fit(feats_train, y_train)
-    
 
     # save stuff
     acc = m.score(feats_test, y_test)
-    print('acc', acc)
+    logging.info(f'acc {acc:0.2f}')
     r['dset'].append(args.dset)
     r['feats'].append(model)
     r['acc'].append(acc)
@@ -203,6 +234,7 @@ def fit_decoding(
     r['seed'].append(args.seed)
     df = pd.DataFrame.from_dict(r).set_index('feats')
     df.to_pickle(fname_save)
+    return df
 
 
 if __name__ == '__main__':
@@ -217,7 +249,9 @@ if __name__ == '__main__':
                             Ending in vecs uses a word-vector model. \
                             Otherwise uses HF checkpoint.')  # glovevecs, bert-10__ndel=4fmri, bert-base-uncased
     parser.add_argument('--dset', type=str, default='rotten_tomatoes',
-                        choices=['trec', 'emotion', 'rotten_tomatoes', 'tweet_eval', 'sst2'])
+                        choices=['trec', 'emotion', 'rotten_tomatoes', 'tweet_eval',
+                                 'sst2', 'go_emotions', 'poem_sentiment', 'moral_stories'])
+    # could also support more tweet dsets (currently only hate), imdb, ...
     parser.add_argument('--subsample_frac', type=float,
                         default=None, help='fraction of data to use for training. If none or negative, use all the data')
     parser.add_argument('--use_cache', type=int,
@@ -232,7 +266,8 @@ if __name__ == '__main__':
         logger.info('\t' + k + ' ' + str(vars(args)[k]))
 
     # check for caching
-    fname_save = join(args.save_dir, f'{args.dset}_{args.model}_seed={args.seed}.pkl')
+    fname_save = join(
+        args.save_dir, f'{args.dset}_{args.model}_seed={args.seed}.pkl')
     if os.path.exists(fname_save) and args.use_cache:
         logging.info('\nAlready ran ' + fname_save + '!')
         logging.info('Skipping :)!\n')
