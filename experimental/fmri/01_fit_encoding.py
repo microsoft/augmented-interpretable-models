@@ -19,7 +19,7 @@ from ridge_utils.ridge import bootstrap_ridge
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser()
 	parser.add_argument("--subject", type=str, default='UTS03')
-	parser.add_argument("--feature", type=str, default='bert-10')
+	parser.add_argument("--feature", type=str, default='bert-10', choices=list(_FEATURE_CONFIG.keys()))
 	parser.add_argument("--sessions", nargs='+', type=int, default=[1, 2, 3, 4, 5])
 	parser.add_argument("--trim", type=int, default=5)
 	parser.add_argument("--ndelays", type=int, default=4)
@@ -40,9 +40,6 @@ if __name__ == "__main__":
 	args = parser.parse_args()
 	globals().update(args.__dict__)
 	print('args', vars(args))
-
-	fs = " ".join(_FEATURE_CONFIG.keys())
-	assert args.feature in _FEATURE_CONFIG.keys(), "Available feature spaces:" + fs
 
 	# set up saving....
 	def get_save_dir(results_dir, feature, subject, ndelays):

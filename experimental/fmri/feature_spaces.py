@@ -66,7 +66,6 @@ def get_embs_from_text(text_list: List[str], embedding_function, ngram_size: int
     embedding_function
         ngram -> fixed size vector
 
-
 	Returns
 	-------
 	embs: np.ndarray (len(text_list), embedding_size)
@@ -224,14 +223,14 @@ def get_glove_vectors(allstories):
     return downsample_word_vectors(allstories, vectors, wordseqs)
 
 
-def get_bert_vectors(allstories, model='bert-base-uncased', ngram_size=5):
+def get_llm_vectors(allstories, model='bert-base-uncased', ngram_size=5):
     """Get bert vectors
     """
     pipe = pipeline("feature-extraction", model=model, device=0)
     wordseqs = get_story_wordseqs(allstories)
     vectors = {}
 
-    print('extracting bert vecs...')
+    print(f'extracting {model} embs...')
     for story in tqdm(allstories):
         ds = wordseqs[story]
         embs = get_embs_from_text(
@@ -239,7 +238,6 @@ def get_bert_vectors(allstories, model='bert-base-uncased', ngram_size=5):
         vectors[story] = DataSequence(
             embs, ds.split_inds, ds.data_times, ds.tr_times).data
     return downsample_word_vectors(allstories, vectors, wordseqs)
-
 
 ############################################
 ########## Feature Space Creation ##########
@@ -250,10 +248,14 @@ _FEATURE_CONFIG = {
     "wordrate": get_wordrate_vectors,
     "eng1000": get_eng1000_vectors,
     'glove': get_glove_vectors,
-    'bert-3': partial(get_bert_vectors, ngram_size=3),
-    'bert-5': partial(get_bert_vectors, ngram_size=5),
-    'bert-10': partial(get_bert_vectors, ngram_size=10),
-    'bert-20': partial(get_bert_vectors, ngram_size=20),
+    'bert-3': partial(get_llm_vectors, ngram_size=3),
+    'bert-5': partial(get_llm_vectors, ngram_size=5),
+    'bert-10': partial(get_llm_vectors, ngram_size=10),
+    'bert-20': partial(get_llm_vectors, ngram_size=20),
+    'roberta-3': partial(get_llm_vectors, ngram_size=3, model='roberta-large'),
+    'roberta-5': partial(get_llm_vectors, ngram_size=5, model='roberta-large'),
+    'roberta-10': partial(get_llm_vectors, ngram_size=10, model='roberta-large'),
+    'roberta-20': partial(get_llm_vectors, ngram_size=20, model='roberta-large'),
 }
 
 

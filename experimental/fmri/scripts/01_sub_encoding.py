@@ -7,7 +7,7 @@ repo_dir = dirname(dirname(os.path.abspath(__file__)))
 # python /home/chansingh/emb-gam/experimental/fmri/01_fit_encoding.py --feature bert-10 --ndelays 2 --seed 1 --subject UTS03
 
 PARAMS_COUPLED_DICT = {}
-# { 
+# {
 #     ('checkpoint', 'batch_size'): [
 #         ('gpt2-xl', 32),
 #         ('EleutherAI/gpt-neo-2.7B', 16),
@@ -20,13 +20,18 @@ PARAMS_COUPLED_DICT = {}
 PARAMS_SHARED_DICT = {
     # things to vary
     'ndelays': [4],
-    'feature': ['eng1000', 'glove', 'bert-3', 'bert-5', 'bert-10', 'bert-20'],
+    'feature': [
+        'roberta-10', 'bert-10',
+        'eng1000', 'glove',
+        'bert-3', 'bert-5', 'bert-20'
+    ],
 
     # things to average over
     'seed': [1],
 
     # fixed params
-    'subject': ['UTS03', 'UTS02', 'UTS01', 'UTS04', 'UTS05', 'UTS06'], #'UTS03', 'UTS01', 'UTS02'],
+    # 'UTS03', 'UTS01', 'UTS02'],
+    'subject': ['UTS03', 'UTS02', 'UTS01'], #, 'UTS04', 'UTS05', 'UTS06'],
 }
 
 ks_final, param_combos_final = submit_utils.combine_param_dicts(
