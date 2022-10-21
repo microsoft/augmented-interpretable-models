@@ -44,15 +44,6 @@ if __name__ == "__main__":
 	fs = " ".join(_FEATURE_CONFIG.keys())
 	assert args.feature in _FEATURE_CONFIG.keys(), "Available feature spaces:" + fs
 
-	if args.story_override:
-		train_stories = ['sloth']
-		test_stories = ['sloth']
-		allstories = ['sloth']
-	else:
-		assert np.amax(args.sessions) <= 5 and np.amin(args.sessions) >=1, "1 <= session <= 5"
-		train_stories, test_stories, allstories = encoding_utils.get_allstories(args.sessions)
-	
-
 	# set up saving....
 	def get_save_dir(results_dir, feature, subject, ndelays):
 		save_dir = join(results_dir, 'encoding', feature + f'__ndel={ndelays}', subject)
@@ -63,7 +54,18 @@ if __name__ == "__main__":
 		save_dir = get_save_dir(results_dir, args.feature, args.subject, args.ndelays)
 
 	print("Saving encoding model & results to:", save_dir)
+	if os.path.exists(join(save_dir, 'valinds.npz')):
+		print('Already ran! Skipping....')
+		exit(0)
 	os.makedirs(save_dir, exist_ok=True)
+
+	if args.story_override:
+		train_stories = ['sloth']
+		test_stories = ['sloth']
+		allstories = ['sloth']
+	else:
+		assert np.amax(args.sessions) <= 5 and np.amin(args.sessions) >=1, "1 <= session <= 5"
+		train_stories, test_stories, allstories = encoding_utils.get_allstories(args.sessions)
 
 	downsampled_feat = get_feature_space(args.feature, allstories)
 	print("Stimulus & Response parameters:")
