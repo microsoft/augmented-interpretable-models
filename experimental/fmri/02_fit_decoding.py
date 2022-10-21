@@ -67,7 +67,6 @@ def get_dsets(dataset: str, seed: int = 1, subsample_frac: float = None):
         y = np.array([yy[0] for yy in y])[idxs].tolist()
         return X, y
 
-
     def get_X(d, dataset_key_text, dataset):
         if not dataset == 'moral_stories':
             return d[dataset_key_text]
@@ -111,7 +110,9 @@ def get_word_vecs(X: List[str], model='eng1000') -> np.ndarray:
 def get_ngram_vecs(X: List[str], model='bert-3') -> np.ndarray:
     if model.lower().startswith('bert-'):
         pipe = pipeline("feature-extraction",
-                        model='bert-base-uncased', device=0)
+                        model='bert-base-uncased',
+                        truncation=True,
+                        device=0)
         ngram_size = int(model.split('-')[1].split('__')[0])
     return feature_spaces.get_embs_from_text(
         X, embedding_function=pipe, ngram_size=ngram_size)
