@@ -2,7 +2,7 @@
 <p align="center"> Interpretable linear model that leverages a pre-trained language model to better learn interactions. One-line fit function.
 </p>
 <p align="center">
-  <a href="https://csinva.github.io/emb-gam/">📚 sklearn-friendly api</a> •
+  <a href="http://csinva.io/imodelsX/embgam/embgam.html#imodelsx.embgam.embgam.EmbGAMClassifier">📚 sklearn-friendly api</a> •
   <a href="https://github.com/csinva/emb-gam/blob/master/demo.ipynb">📖 demo notebook</a>
 </p>
 <p align="center">
@@ -22,7 +22,7 @@
 **Installation**: The best way to use Emb-GAM is through the [imodelsx](https://github.com/csinva/imodelsX) package: `pip install imodelsx`
   - For finer control, you can instead clone and install this repo from source
 
-**Usage example** (see <a href="https://csinva.github.io/emb-gam/">api</a> or <a href="https://github.com/csinva/emb-gam/blob/master/demo.ipynb">demo notebook</a> for more details):
+**Usage example** (see <a href="http://csinva.io/imodelsX/embgam/embgam.html#imodelsx.embgam.embgam.EmbGAMClassifier">api</a> or <a href="https://github.com/csinva/emb-gam/blob/master/demo.ipynb">demo notebook</a> for more details):
 
 ```python
 from imodelsx import EmbGAMClassifier
