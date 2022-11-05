@@ -25,12 +25,12 @@ path_to_current_file = os.path.dirname(os.path.abspath(__file__))
 if __name__ == '__main__':
     PARAMS_LIST = [
         {
+            'dataset': ['tweet_eval'],
+            'checkpoint': ['philschmid/BERT-tweet-eval-emotion'], # 'unitary/toxic-bert'], #'philschmid/BERT-tweet-eval-emotion'], # toxigen model throws err
+        },        
+        {
             'dataset': ['emotion'],
             'checkpoint': ['nateraw/bert-base-uncased-emotion'],
-        },
-        {
-            'dataset': ['tweet_eval'],
-            'checkpoint': ['philschmid/BERT-tweet-eval-emotion'],
         },
         {
             'dataset': ['rotten_tomatoes'],
@@ -47,12 +47,12 @@ if __name__ == '__main__':
     ]
     r = defaultdict(list)
     for d in tqdm(PARAMS_LIST):
-        dataset = d['dataset'][0]
+        dataset_name = d['dataset'][0]
         checkpoint = d['checkpoint'][0]
-        print('dataset', dataset, 'checkpoint', checkpoint)
+        print('dataset', dataset_name, 'checkpoint', checkpoint)
 
         # set up data
-        dataset, dataset_key_text = embgam.data.process_data_and_args(dataset)
+        dataset, dataset_key_text = embgam.data.process_data_and_args(dataset_name)
         pipe = pipeline('text-classification', model=checkpoint)
         preds_dicts = pipe(dataset['validation'][dataset_key_text])
         preds = np.array([d['label'] for d in preds_dicts])
@@ -60,7 +60,7 @@ if __name__ == '__main__':
         acc = np.mean(np.array(pred_ids) == dataset['validation']['label'])
 
         # save
-        r['dataset'].append(dataset)
+        r['dataset'].append(dataset_name)
         r['checkpoint'].append(checkpoint)
         r['acc'].append(acc)
         save_dir = oj(config.results_dir)
