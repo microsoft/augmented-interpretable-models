@@ -81,7 +81,8 @@ def get_dataset_for_logistic(
 
             def get_glove_embs(X, vocab, vset, embs, D=300):
                 word_lists = [
-                    [word.lower() for word in sequence.split()]
+                    # [word.lower() for word in sequence.split()]
+                    sequence.split()
                     for sequence in X
                 ]
                 X_embs = np.zeros((len(word_lists), D))
@@ -90,9 +91,10 @@ def get_dataset_for_logistic(
                     for word in word_list:
                         if word in vset:
                             X_embs[i] += embs[vocab[word]]
-                            num += 1
+                        else:
+                           X_embs[i] += embs[vocab['unk']] 
                     if num > 0:
-                        X_embs[i] /= num
+                        X_embs[i] /= len(word_list)
                     # print('num', num)
                     # X_embs.append(np.mean(x_embs, axis=0))
                 return X_embs

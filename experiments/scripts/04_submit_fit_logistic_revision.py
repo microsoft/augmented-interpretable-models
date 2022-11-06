@@ -66,6 +66,7 @@ for PARAMS in PARAMS_LIST:
         param_str = 'python ../03_fit_logistic.py '
         for j, key in enumerate(ks):
             param_str += '--' + key + ' ' + str(param_combinations[i][j]) + ' '
+        # param_str += '--ignore_cache'
         # s.run(param_str)
         # print(param_str)
         num += 1

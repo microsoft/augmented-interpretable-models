@@ -84,8 +84,7 @@ if __name__ == '__main__':
         seed=args.seed, subsample=-1,
         dataset_key_text=dataset_key_text,
     )
-    X_train, X_val, y_train, y_val = embgam.linear.get_dataset_for_logistic(
-        **kwargs)
+    X_train, X_val, y_train, y_val = embgam.linear.get_dataset_for_logistic(**kwargs)
 
     # test on a different dset
     if args.ngrams_test is not None:
