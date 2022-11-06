@@ -1,5 +1,5 @@
 from transformers import BertModel, DistilBertModel
-from transformers import AutoModelForCausalLM
+from transformers import AutoModelForCausalLM, AutoModel
 from os.path import join as oj
 import torch
 
@@ -56,10 +56,8 @@ def generate_ngrams_list(
 
 
 def get_model(checkpoint):
-    if 'distilbert' in checkpoint.lower():
-        model = DistilBertModel.from_pretrained(checkpoint)
-    elif 'bert-base' in checkpoint.lower() or 'BERT' in checkpoint:
-        model = BertModel.from_pretrained(checkpoint)
+    if 'bert' in checkpoint.lower():
+        model = AutoModel.from_pretrained(checkpoint)
     elif 'gpt' in checkpoint.lower():
         model = AutoModelForCausalLM.from_pretrained(
             checkpoint, output_hidden_states=True)
