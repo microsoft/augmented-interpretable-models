@@ -1,5 +1,5 @@
 import itertools
-
+import os
 # slurm params
 partition = 'high'
 
@@ -48,7 +48,7 @@ for i in range(len(PARAMS_LIST)):
 
 # print(PARAMS_LIST)
 
-
+num = 0
 for PARAMS in PARAMS_LIST:
     ks = list(PARAMS.keys())
     vals = [PARAMS[k] for k in ks]
@@ -62,8 +62,11 @@ for PARAMS in PARAMS_LIST:
 
     py = 'python'
     for i in range(len(param_combinations)):
+        print(f'-------------------\n\n{num} / {len(param_combinations) * len(PARAMS_LIST)}\n---------------------\n')
         param_str = 'python ../03_fit_logistic.py '
         for j, key in enumerate(ks):
             param_str += '--' + key + ' ' + str(param_combinations[i][j]) + ' '
         # s.run(param_str)
-        print(param_str)
+        # print(param_str)
+        num += 1
+        os.system(param_str)
