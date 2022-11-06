@@ -27,7 +27,7 @@ def get_dataset_for_logistic(
     y_val = dataset['validation']['label']
 
     # load embeddings
-    if 'bert-base' in checkpoint or 'distilbert' in checkpoint or 'BERT' in checkpoint:
+    if 'bert-base' in checkpoint or 'distilbert' in checkpoint or 'BERT' in checkpoint or 'roberta' in checkpoint.lower():
         if all_ngrams:
             try:
                 data = pkl.load(open(oj(data_dir, 'data.pkl'), 'rb'))

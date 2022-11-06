@@ -24,10 +24,10 @@ path_to_current_file = os.path.dirname(os.path.abspath(__file__))
 
 if __name__ == '__main__':
     PARAMS_LIST = [
-        {
-            'dataset': ['tweet_eval'],
-            'checkpoint': ['philschmid/BERT-tweet-eval-emotion'], # 'unitary/toxic-bert'], #'philschmid/BERT-tweet-eval-emotion'], # toxigen model throws err
-        },        
+        # {
+        #     'dataset': ['tweet_eval'],
+        #     'checkpoint': ['philschmid/BERT-tweet-eval-emotion'], # 'unitary/toxic-bert'], #'philschmid/BERT-tweet-eval-emotion'], # toxigen model throws err
+        # },        
         {
             'dataset': ['emotion'],
             'checkpoint': ['nateraw/bert-base-uncased-emotion'],
@@ -53,7 +53,7 @@ if __name__ == '__main__':
 
         # set up data
         dataset, dataset_key_text = embgam.data.process_data_and_args(dataset_name)
-        pipe = pipeline('text-classification', model=checkpoint)
+        pipe = pipeline('text-classification', model=checkpoint, device=0)
         preds_dicts = pipe(dataset['validation'][dataset_key_text])
         preds = np.array([d['label'] for d in preds_dicts])
         pred_ids = list(map(pipe.model.config.label2id.get, preds))

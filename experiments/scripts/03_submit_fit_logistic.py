@@ -13,39 +13,39 @@ s = Slurm("fit_logistic", {"partition": partition, "time": "1-0"})
 
 
 GLOBAL_PARAMS = {
-    'subsample': [-1, 100, 1000], # 100, 1000
-    'ngrams': [1, 2, 3, 4, 5, 6, 7],    
-    'all': ['all'],    
-    'layer': ['last_hidden_state_mean', 'pooler_output'],    
-    'seed': [1, 2, 3],    
+    'subsample': [-1, 100, 1000],  # 100, 1000
+    'ngrams': [1, 2, 3, 4, 5, 6, 7],
+    'all': ['all'],
+    'layer': ['last_hidden_state_mean', 'pooler_output'],
+    'seed': [1, 2, 3],
 }
 
 PARAMS_LIST = [
-{
-    'dataset': ['emotion'],
-    'checkpoint': ['nateraw/bert-base-uncased-emotion',
-                   'aatmasidha/distilbert-base-uncased-finetuned-emotion'],
-},    
-{
-    'dataset': ['tweet_eval'],
-    'checkpoint': ['philschmid/BERT-tweet-eval-emotion',
-                   'philschmid/DistilBERT-tweet-eval-emotion'],
-},    
-{
-    'dataset': ['rotten_tomatoes'],
-    'checkpoint': ['textattack/bert-base-uncased-rotten_tomatoes',
-                   'textattack/distilbert-base-uncased-rotten-tomatoes'],
-},     
-{
-    'dataset': ['financial_phrasebank'],
-    'checkpoint': ['ahmedrachid/FinancialBERT-Sentiment-Analysis',
-                  'yseop/distilbert-base-financial-relation-extraction'],
-},     
-{
-    'dataset': ['sst2'],
-    'checkpoint': ['textattack/bert-base-uncased-SST-2',           
-                   'distilbert-base-uncased-finetuned-sst-2-english',],
-},     
+    {
+        'dataset': ['emotion'],
+        'checkpoint': ['nateraw/bert-base-uncased-emotion',
+                       'aatmasidha/distilbert-base-uncased-finetuned-emotion'],
+    },
+    {
+        'dataset': ['tweet_eval'],
+        'checkpoint': ['philschmid/BERT-tweet-eval-emotion',
+                       'philschmid/DistilBERT-tweet-eval-emotion'],
+    },
+    {
+        'dataset': ['rotten_tomatoes'],
+        'checkpoint': ['textattack/bert-base-uncased-rotten_tomatoes',
+                       'textattack/distilbert-base-uncased-rotten-tomatoes'],
+    },
+    {
+        'dataset': ['financial_phrasebank'],
+        'checkpoint': ['ahmedrachid/FinancialBERT-Sentiment-Analysis',
+                       'yseop/distilbert-base-financial-relation-extraction'],
+    },
+    {
+        'dataset': ['sst2'],
+        'checkpoint': ['textattack/bert-base-uncased-SST-2',
+                       'distilbert-base-uncased-finetuned-sst-2-english', ],
+    },
 ]
 
 CHECKPOINTS_SHARED = [
@@ -53,6 +53,7 @@ CHECKPOINTS_SHARED = [
     'tfidfvectorizer',
     'bert-base-uncased',
     'distilbert-base-uncased',
+    'glove_wordvecs',
 ]
 
 for i in range(len(PARAMS_LIST)):
@@ -107,9 +108,8 @@ for PARAMS in PARAMS_LIST:
     vals += [GLOBAL_PARAMS[k] for k in ks2]
     ks += ks2
 
-    param_combinations_all = list(itertools.product(*vals)) # list of tuples
-    
-    
+    param_combinations_all = list(itertools.product(*vals))  # list of tuples
+
     # block impossible pairings
     checkpoint_key = ks.index('checkpoint')
     layer_key = ks.index('layer')
@@ -124,11 +124,12 @@ for PARAMS in PARAMS_LIST:
                     param_combinations.append(param_tuple)
         else:
             param_combinations.append(param_tuple)
-    
-    print('filtered from', len(param_combinations_all), 'to', len(param_combinations))
+
+    print('filtered from', len(param_combinations_all),
+          'to', len(param_combinations))
     print(checkpoint_key, layer_key)
     for i in range(len(param_combinations)):
-        param_str = '/usr/local/linux/anaconda3.8/bin/python3 ../02_fit_logistic.py '    
+        param_str = '/usr/local/linux/anaconda3.8/bin/python3 ../02_fit_logistic.py '
         for j, key in enumerate(ks):
             param_str += '--' + key + ' ' + str(param_combinations[i][j]) + ' '
         s.run(param_str)

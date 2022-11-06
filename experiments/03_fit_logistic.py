@@ -75,6 +75,7 @@ if __name__ == '__main__':
     dataset, dataset_key_text = embgam.data.process_data_and_args(args.dataset)
 
     # get data
+    print('\tload features...')
     r = vars(args)
     kwargs = dict(
         checkpoint=args.checkpoint, ngrams=args.ngrams,
@@ -96,6 +97,7 @@ if __name__ == '__main__':
     r['num_features'] = X_train.shape[1]
 
     # fit and return model
+    print('\tfit model...')
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
         embgam.linear.fit_and_score_logistic(

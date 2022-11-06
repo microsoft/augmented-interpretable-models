@@ -25,7 +25,6 @@ PARAMS_LIST = [
     },
     {
         'dataset': ['financial_phrasebank'],
-        # 'checkpoint': ['ahmedrachid/FinancialBERT-Sentiment-Analysis'],
         'checkpoint': ['abhilash1910/financial_roberta'], #  note this match isn't perfect
     }
 ]

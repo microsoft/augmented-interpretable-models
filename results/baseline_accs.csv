@@ -1,0 +1,6 @@
+,dataset,checkpoint,acc
+0,tweet_eval,philschmid/BERT-tweet-eval-emotion,0.455
+1,emotion,nateraw/bert-base-uncased-emotion,0.9365
+2,rotten_tomatoes,textattack/bert-base-uncased-rotten_tomatoes,0.875234521575985
+3,financial_phrasebank,ahmedrachid/FinancialBERT-Sentiment-Analysis,0.980701754385965
+4,sst2,textattack/bert-base-uncased-SST-2,0.9243119266055045

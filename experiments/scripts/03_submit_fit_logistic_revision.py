@@ -1,7 +1,6 @@
 import itertools
 import os
-# slurm params
-partition = 'high'
+import random
 
 # python ../02_fit_logistic.py --dataset financial_phrasebank --checkpoint distilbert-base-uncased --subsample 1000 --ngrams 1 --all all --layer last_hidden_state_mean --seed 1
 
@@ -11,35 +10,34 @@ partition = 'high'
 
 
 GLOBAL_PARAMS = {
-    'subsample': [-1],  # 100, 1000
+    'subsample': [-1],
+    'ngrams': [1, 2, 3, 4, 5, 6, 7],
+    'all': ['all'],
+    'layer': ['last_hidden_state_mean'],
     'seed': [1, 2, 3],
 }
 
 PARAMS_LIST = [
     {
+        'dataset': ['sst2'],    
+        'checkpoint': ['textattack/roberta-base-SST-2'],
+    },
+    {
         'dataset': ['emotion'],
-        'checkpoint': [],
+        'checkpoint': ['bhadresh-savani/roberta-base-emotion'], #        
     },
     {
-        'dataset': ['tweet_eval'],
-        'checkpoint': [],
-    },
-    {
-        'dataset': ['rotten_tomatoes'],
-        'checkpoint': [],
+       'dataset': ['rotten_tomatoes'],
+        'checkpoint': ['textattack/roberta-base-rotten-tomatoes'], #        
     },
     {
         'dataset': ['financial_phrasebank'],
-        'checkpoint': [],
-    },
-    {
-        'dataset': ['sst2'],
-        'checkpoint': [],
-    },
+        'checkpoint': ['abhilash1910/financial_roberta'], #  note this match isn't perfect
+    }
 ]
 
 CHECKPOINTS_SHARED = [
-    'glove_wordvecs',
+    
 ]
 
 for i in range(len(PARAMS_LIST)):
@@ -49,6 +47,7 @@ for i in range(len(PARAMS_LIST)):
 # print(PARAMS_LIST)
 
 num = 0
+random.shuffle(PARAMS_LIST)
 for PARAMS in PARAMS_LIST:
     ks = list(PARAMS.keys())
     vals = [PARAMS[k] for k in ks]
@@ -59,6 +58,7 @@ for PARAMS in PARAMS_LIST:
 
     param_combinations_all = list(itertools.product(*vals))  # list of tuples
     param_combinations = param_combinations_all
+    random.shuffle(param_combinations)
 
     py = 'python'
     for i in range(len(param_combinations)):
