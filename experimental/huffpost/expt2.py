@@ -18,7 +18,7 @@ if __name__ == "__main__":
             huffpost_data,
             year=train_year,
             in_dist=True,
-            frac=0.03,
+            frac=1,
         )
         for test_year in [2012, 2013, 2014, 2015, 2016, 2017, 2018]:
             if train_year == test_year:
@@ -34,7 +34,7 @@ if __name__ == "__main__":
                     huffpost_data,
                     year=test_year,
                     in_dist=True,
-                    frac=0.003,
+                    frac=0.2,
                 )
                 m = EmbGAMClassifier(
                     all_ngrams=True,
