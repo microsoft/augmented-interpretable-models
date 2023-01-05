@@ -51,10 +51,11 @@ def sample_data(huffpost_data, year, in_dist=True, frac=1):
         data = huffpost_data[year][2]["headline"]
         labels = huffpost_data[year][2]["category"]
 
+    assert len(data) == len(labels), "Number of data points and labels don't match!"
+    nonnull_idx = [i for i, x in enumerate(data) if x != ""]
+    data, labels = [data[i] for i in nonnull_idx], [labels[i] for i in nonnull_idx]
+
     if frac == 1:
         return data, labels
-
-    assert len(data) == len(labels), "Number of data points and labels don't match!"
     inds = set(random.sample(list(range(len(data))), int(frac * len(data))))
-
     return [data[i] for i in inds], [labels[i] for i in inds]

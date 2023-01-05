@@ -24,3 +24,11 @@ expt2
     - Test data: 2012-2018 OOD data
     - checkpoint="bert-base-uncased"
     - ngrams=2
+
+expt3
+    - train on 2012/2013 bi-tri gram and then test on 2014 and play around
+    - try textattack/bert-base-uncased-ag-news
+
+    For 2014 and other years it performs poorly
+    Mean/Std Frac unseen ngrams:  0.2924734106257423 / 0.13149407243193298
+
