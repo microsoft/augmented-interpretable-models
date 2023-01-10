@@ -5,6 +5,7 @@ transformers[torch]
 datasets
 scikit-learn
 spacy
+skorch
 imodelsx
 
 # basic
