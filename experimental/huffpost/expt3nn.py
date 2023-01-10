@@ -28,10 +28,7 @@ BATCH_SIZE = 32
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 
 
-def embed(X):
-    tokenizer = transformers.AutoTokenizer.from_pretrained(TOKENIZER)
-    model = transformers.AutoModel.from_pretrained(PRETRAINED_MODEL).to("cpu")
-
+def embed(X, tokenizer, model):
     tokens = tokenizer(X, padding=True, truncation=True, return_tensors="pt")
     tokens = tokens.to(model.device)
     output = model(**tokens)
@@ -94,7 +91,9 @@ if __name__ == "__main__":
         assert factor > 0
         return factor
 
-    X, y = embed(data), np.array(labels)
+    tokenizer = transformers.AutoTokenizer.from_pretrained(TOKENIZER)
+    model = transformers.AutoModel.from_pretrained(PRETRAINED_MODEL).to("cpu")
+    X, y = embed(data, tokenizer, model), np.array(labels)
     pipeline = create_pipeline(lr_schedule=lr_schedule)
     pipeline.fit(X, y)
     breakpoint()
