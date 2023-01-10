@@ -10,6 +10,7 @@ from skorch.hf import HuggingfacePretrainedTokenizer
 from torch import nn
 from torch.optim.lr_scheduler import LambdaLR
 import transformers
+from tqdm import tqdm
 
 from preprocess import clean_headlines, sample_data
 
@@ -93,7 +94,10 @@ if __name__ == "__main__":
 
     tokenizer = transformers.AutoTokenizer.from_pretrained(TOKENIZER)
     model = transformers.AutoModel.from_pretrained(PRETRAINED_MODEL).to("cpu")
-    X, y = embed(data, tokenizer, model), np.array(labels)
+    X = []
+    for x in data:
+        X.append(embed(x, tokenizer, model))
+    y = np.array(labels)
     pipeline = create_pipeline(lr_schedule=lr_schedule)
     pipeline.fit(X, y)
     breakpoint()
