@@ -1,10 +1,11 @@
-from imodelsx import EmbGAMClassifier
-import pandas as pd
-import numpy as np
-import sklearn.metrics
 import pickle as pkl
-import embgam.embed
 import warnings
+
+import embgam.embed
+import numpy as np
+import pandas as pd
+import sklearn.metrics
+from imodelsx import EmbGAMClassifier
 from sklearn.base import ClassifierMixin, RegressorMixin
 
 

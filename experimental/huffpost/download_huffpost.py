@@ -1,7 +1,7 @@
-from wildtime import dataloader
 import argparse
-from wildtime.configs.eval_stream import configs_huffpost
 
+from wildtime import dataloader
+from wildtime.configs.eval_stream import configs_huffpost
 
 """
 Due to conflicting package dependencies between imodelsx and wildtime, 

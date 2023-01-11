@@ -1,8 +1,10 @@
-from imodelsx import EmbGAMClassifier
-from preprocess import clean_headlines, sample_data
-import numpy as np
-import pickle as pkl
 import os
+import pickle as pkl
+
+import numpy as np
+from imodelsx import EmbGAMClassifier
+
+from preprocess import clean_headlines, sample_data
 
 
 def generate_fixed_data(huffpost_data):

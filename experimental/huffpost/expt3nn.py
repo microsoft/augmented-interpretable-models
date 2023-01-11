@@ -3,13 +3,13 @@ import pickle as pkl
 
 import numpy as np
 import torch
+import transformers
+from sklearn.metrics import accuracy_score
 from sklearn.pipeline import Pipeline
 from skorch import NeuralNetClassifier
 from skorch.callbacks import LRScheduler, ProgressBar
-from skorch.hf import HuggingfacePretrainedTokenizer
 from torch import nn
 from torch.optim.lr_scheduler import LambdaLR
-import transformers
 from tqdm import tqdm
 
 from preprocess import clean_headlines, sample_data
@@ -75,7 +75,7 @@ def create_pipeline(lr_schedule):
     return pipeline
 
 
-if __name__ == "__main__":
+def compute_embs():
     # load data
     with open(f"Data/huffpost.pkl", "rb") as f:
         huffpost_data = pkl.load(f)
@@ -98,24 +98,39 @@ if __name__ == "__main__":
 
             d[key_data] = np.array(X)
             d[key_labels] = np.array(labels)
-            
+
         # save embeddings
         pkl.dump(d, open(f"Data/emb_{year}.pkl", "wb"))
 
-    num_training_steps = MAX_EPOCHS * (len(data) // BATCH_SIZE + 1)
 
-    def lr_schedule(current_step):
-        factor = float(num_training_steps - current_step) / float(
-            max(1, num_training_steps)
-        )
-        assert factor > 0
-        return factor
+if __name__ == "__main__":
+    # compute embs if they dont exist
+    # compute_embs()
 
-        breakpoint()
-    pipeline = create_pipeline(lr_schedule=lr_schedule)
-    pipeline.fit(X, y)
+    for year in [2012, 2013, 2014, 2015, 2016, 2017, 2018]:
+        with open(f"Data/emb_{year}.pkl", "rb") as f:
+            emb = pkl.load(f)
 
-    # save model
-    if not os.path.exists("models/expt3"):
-        os.makedirs("models/expt3")
-    pkl.dump(pipeline, open(f"models/expt3/expt3nn.pkl", "wb"))
+        X_train, y_train = emb["X_id"], emb["y_id"]
+        X_test, y_test = emb["X_od"], emb["y_od"]
+
+        num_training_steps = MAX_EPOCHS * (len(y_train) // BATCH_SIZE + 1)
+
+        def lr_schedule(current_step):
+            factor = float(num_training_steps - current_step) / float(
+                max(1, num_training_steps)
+            )
+            assert factor > 0
+            return factor
+
+        pipeline = create_pipeline(lr_schedule=lr_schedule)
+        pipeline.fit(X_train, y_train)
+
+        with torch.inference_mode():
+            y_pred = pipeline.predict(X_test)
+        print(f"{year} OOD test accuracy ", accuracy_score(y_test, y_pred))
+
+        # save model
+        if not os.path.exists("models/expt3"):
+            os.makedirs("models/expt3")
+        pkl.dump(pipeline, open(f"models/expt3/expt3nn.pkl", "wb"))

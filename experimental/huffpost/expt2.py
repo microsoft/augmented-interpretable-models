@@ -1,9 +1,10 @@
-from imodelsx import EmbGAMClassifier
-from preprocess import clean_headlines, sample_data
-import numpy as np
-import pickle as pkl
 import os
+import pickle as pkl
 
+import numpy as np
+from imodelsx import EmbGAMClassifier
+
+from preprocess import clean_headlines, sample_data
 
 if __name__ == "__main__":
     # load data

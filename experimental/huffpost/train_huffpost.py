@@ -1,5 +1,6 @@
-from imodelsx import EmbGAMClassifier
 import pickle as pkl
+
+from imodelsx import EmbGAMClassifier
 
 # load model
 with open(f"Data/huffpost.pkl", "rb") as f:
