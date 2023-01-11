@@ -80,8 +80,27 @@ if __name__ == "__main__":
     with open(f"Data/huffpost.pkl", "rb") as f:
         huffpost_data = pkl.load(f)
 
+    tokenizer = transformers.AutoTokenizer.from_pretrained(TOKENIZER)
+    model = transformers.AutoModel.from_pretrained(PRETRAINED_MODEL).to("cpu")
     huffpost_data = clean_headlines(huffpost_data)
-    data, labels = sample_data(huffpost_data, 2012, in_dist=True, frac=1)
+    for year in [2012, 2013, 2014, 2015, 2016, 2017, 2018]:
+        print("Year ", year)
+        d = {"X_id": [], "y_id": [], "X_od": [], "y_od": []}
+        for in_dist in [True, False]:
+            data, labels = sample_data(huffpost_data, year, in_dist=in_dist, frac=1)
+            X = []
+            for x in tqdm(data):
+                X.append(embed(x, tokenizer, model))
+            if in_dist:
+                key_data, key_labels = "X_id", "y_id"
+            else:
+                key_data, key_labels = "X_od", "y_od"
+
+            d[key_data] = np.array(X)
+            d[key_labels] = np.array(labels)
+            
+        # save embeddings
+        pkl.dump(d, open(f"Data/emb_{year}.pkl", "wb"))
 
     num_training_steps = MAX_EPOCHS * (len(data) // BATCH_SIZE + 1)
 
@@ -92,15 +111,9 @@ if __name__ == "__main__":
         assert factor > 0
         return factor
 
-    tokenizer = transformers.AutoTokenizer.from_pretrained(TOKENIZER)
-    model = transformers.AutoModel.from_pretrained(PRETRAINED_MODEL).to("cpu")
-    X = []
-    for x in data:
-        X.append(embed(x, tokenizer, model))
-    y = np.array(labels)
+        breakpoint()
     pipeline = create_pipeline(lr_schedule=lr_schedule)
     pipeline.fit(X, y)
-    breakpoint()
 
     # save model
     if not os.path.exists("models/expt3"):
