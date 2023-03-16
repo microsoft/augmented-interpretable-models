@@ -16,6 +16,13 @@ def run_dataset(dataset: str='financial_phrasebank'):
     dset_train = dset['train']
     dset_val = dset['validation']
 
+    INSTRUCTIONS = {
+        'rotten_tomatoes': 'Represent the Review sentence for classifying emotion as positive or negative; Input:',
+        'sst2': 'Represent the Review sentence for classifying emotion as positive or negative; Input:',
+        'emotion': 'Represent the Tweet for classifying emotion as positive or negative; Input:', 
+        'financial_phrasebank': 'Represent the Financial statement for classifying emotion as positive or negative; Input:', 
+    }
+
 
     # subsample
     # subsample_frac = 0.01
@@ -34,8 +41,9 @@ def run_dataset(dataset: str='financial_phrasebank'):
     m = EmbGAMClassifier(
         checkpoint=checkpoint,
         all_ngrams=True,
-        ngrams=4,
+        ngrams=7,
         random_state=42,
+        instructor_prompt=INSTRUCTIONS[dataset],
     )
     m.fit(dset_train[dataset_key_text], dset_train['label'], verbose=True)
 
