@@ -1,7 +1,7 @@
 from datetime import datetime
 import warnings
 import sklearn
-import config
+import embgam.config as config
 from datasets import load_from_disk
 import embgam.linear
 import embgam.data

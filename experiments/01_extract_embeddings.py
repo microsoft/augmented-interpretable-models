@@ -10,7 +10,7 @@ from os.path import join as oj
 from spacy.lang.en import English
 import spacy
 import argparse
-import config
+import embgam.config as config
 import torch
 import embgam.data
 import embgam.embed

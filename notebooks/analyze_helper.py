@@ -2,7 +2,6 @@ import matplotlib.pyplot as plt
 from os.path import join as oj
 import seaborn as sns
 import string
-import experiments.config as config
 import pandas as pd
 from transformers import BertModel, DistilBertModel
 from transformers import pipeline
@@ -18,6 +17,8 @@ from collections import defaultdict
 from copy import deepcopy
 from tqdm import tqdm
 import dvu
+import sys
+import embgam.config as config
 
 dvu.set_style()
 
