@@ -186,5 +186,5 @@ def get_sst_dataset():
         dataset = 'sst2'
         padding = True
     args = A()
-    dataset, args = data.process_data_and_args(args)
+    dataset, args = data.process_data_and_args(args.dataset)
     return dataset

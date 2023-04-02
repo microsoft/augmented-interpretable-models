@@ -13,7 +13,6 @@ import pickle as pkl
 from collections import defaultdict
 from copy import deepcopy
 from tqdm import tqdm
-import analyze_helper
 import dvu
 dvu.set_style()
 import pandas as pd
@@ -23,8 +22,11 @@ from typing import List
 import embgam.data as data
 import matplotlib.pyplot as plt
 import seaborn as sns
-import experiments.config as config
+import embgam.config as config
+import sys
+sys.path.append('../notebooks')
 pd.set_option('display.max_rows', None)
+from embgam import analyze_helper
 
 
 # set up model
@@ -81,13 +83,13 @@ if __name__ == '__main__':
         df = pd.read_csv(oj(config.misc_dir, 'df_unigram_sst.csv'), index_col=0)
     except:
         embs = get_embs(words)
-        os.makedirs(config.misc_dir)
+        os.makedirs(config.misc_dir, exist_ok=True)
         pkl.dump(embs, open(oj(config.misc_dir, 'word_embs_sst_train.pkl'), 'wb'))
         pkl.dump(words, open(oj(config.misc_dir, 'word_list_sst_train.pkl'), 'wb'))
 
         # countvec coefs
         matrix = v.transform(dataset['train']['sentence'])
-        tot_counts = pd.DataFrame(matrix.sum(axis=0), columns=v.get_feature_names())
+        tot_counts = pd.DataFrame(matrix.sum(axis=0), columns=v.get_feature_names_out())
         m = LogisticRegressionCV()
         m.fit(matrix, dataset['train']['label'])
         coef = m.coef_.flatten() # note -- coef has not been mapped to same idxs as words
@@ -112,7 +114,7 @@ if __name__ == '__main__':
 
         # countvec coefs
         matrix2 = v2.transform(dataset['train']['sentence'])
-        tot_counts2 = pd.DataFrame(matrix2.sum(axis=0), columns=v2.get_feature_names())
+        tot_counts2 = pd.DataFrame(matrix2.sum(axis=0), columns=v2.get_feature_names_out())
         m2 = LogisticRegressionCV()
         m2.fit(matrix2, dataset['train']['label'])
         coef2 = m2.coef_.flatten() # note -- coef has not been mapped to same idxs as words
@@ -173,7 +175,7 @@ if __name__ == '__main__':
 
         # countvec coefs
         matrix2 = v2.transform(dataset['train']['sentence'])
-        tot_counts2 = pd.DataFrame(matrix2.sum(axis=0), columns=v2.get_feature_names())
+        tot_counts2 = pd.DataFrame(matrix2.sum(axis=0), columns=v2.get_feature_names_out())
         m2 = LogisticRegressionCV()
         m2.fit(matrix2, dataset['train']['label'])
         coef2 = m2.coef_.flatten() # note -- coef has not been mapped to same idxs as words
