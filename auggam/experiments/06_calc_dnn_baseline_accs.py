@@ -1,10 +1,10 @@
 from datetime import datetime
 import warnings
 import sklearn
-import embgam.config as config
+import auggam.config as config
 from datasets import load_from_disk
-import embgam.linear
-import embgam.data
+import auggam.linear
+import auggam.data
 import pandas as pd
 from copy import deepcopy
 from transformers import AutoTokenizer, AutoModelForSequenceClassification, AutoModel, AutoModelForCausalLM, pipeline
@@ -52,7 +52,7 @@ if __name__ == '__main__':
         print('dataset', dataset_name, 'checkpoint', checkpoint)
 
         # set up data
-        dataset, dataset_key_text = embgam.data.process_data_and_args(dataset_name)
+        dataset, dataset_key_text = auggam.data.process_data_and_args(dataset_name)
         pipe = pipeline('text-classification', model=checkpoint, device=0)
         preds_dicts = pipe(dataset['validation'][dataset_key_text])
         preds = np.array([d['label'] for d in preds_dicts])

@@ -1,7 +1,7 @@
-from imodelsx import EmbGAMClassifier
+from imodelsx import AugGAMClassifier
 import numpy as np
 import fire
-from embgam import data
+from auggam import data
 import pickle as pkl
 from os.path import join, dirname, abspath
 path_to_repo = dirname(dirname(abspath(__file__)))
@@ -38,7 +38,7 @@ def run_dataset(dataset: str='financial_phrasebank'):
     # ))
 
     # fit model
-    m = EmbGAMClassifier(
+    m = AugGAMClassifier(
         checkpoint=checkpoint,
         all_ngrams=True,
         ngrams=7,

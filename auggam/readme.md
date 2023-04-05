@@ -1,4 +1,4 @@
-<h1 align="center">   <img src="https://csinva.io/emb-gam/embgam_gif.gif" width="30%"> Emb-GAM <img src="https://csinva.io/emb-gam/embgam_gif.gif" width="30%"></h1>
+<h1 align="center">   <img src="https://csinva.io/emb-gam/embgam_gif.gif" width="30%"> Aug-GAM <img src="https://csinva.io/emb-gam/embgam_gif.gif" width="30%"></h1>
 <p align="center"> Interpretable linear model that leverages a pre-trained language model to better learn interactions. One-line fit function.
 </p>
 <p align="center">
@@ -19,7 +19,7 @@
 </b> Emb-GAM uses a pre-trained language model to extract features from text data then combines them in order to extract out a simple, linear model.
 
 # Quickstart
-**Installation**: The best way to use Emb-GAM is through the [imodelsx](https://github.com/csinva/imodelsX) package: `pip install imodelsx`
+**Installation**: The best way to use Aug-GAM is through the [imodelsx](https://github.com/csinva/imodelsX) package: `pip install imodelsx`
   - For finer control, you can instead clone and install this repo from source
 
 **Usage example** (see <a href="http://csinva.io/imodelsX/embgam/embgam.html#imodelsx.embgam.embgam.EmbGAMClassifier">api</a> or <a href="https://github.com/csinva/emb-gam/blob/master/demo.ipynb">demo notebook</a> for more details):

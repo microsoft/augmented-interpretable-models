@@ -1,4 +1,4 @@
-import embgam.data as data
+import auggam.data as data
 import experiments.config as config
 from os.path import join as oj
 

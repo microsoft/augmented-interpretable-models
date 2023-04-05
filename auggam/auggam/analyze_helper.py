@@ -8,7 +8,7 @@ from transformers import pipeline
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
 import datasets
 import numpy as np
-import embgam.data as data
+import auggam.data as data
 import os.path
 from datasets import load_from_disk
 import pickle as pkl
@@ -18,7 +18,7 @@ from copy import deepcopy
 from tqdm import tqdm
 import dvu
 import sys
-import embgam.config as config
+import auggam.config as config
 
 dvu.set_style()
 

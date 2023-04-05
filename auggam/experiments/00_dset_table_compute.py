@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 from copy import deepcopy
 from collections import defaultdict
-import embgam.data as data
+import auggam.data as data
 import pickle as pkl
 from spacy.lang.en import English
 from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer

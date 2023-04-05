@@ -1,8 +1,7 @@
-from imodelsx import EmbGAMClassifier
 import numpy as np
 import fire
 import pandas as pd
-from embgam import data
+from auggam import data
 import pickle as pkl
 from os.path import join, dirname, abspath
 from spacy.lang.en import English

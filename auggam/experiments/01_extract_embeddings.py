@@ -10,10 +10,10 @@ from os.path import join as oj
 from spacy.lang.en import English
 import spacy
 import argparse
-import embgam.config as config
+import auggam.config as config
 import torch
-import embgam.data
-import embgam.embed
+import auggam.data
+import auggam.embed
 path_to_current_file = os.path.dirname(os.path.abspath(__file__))
 
 
@@ -52,7 +52,7 @@ if __name__ == '__main__':
         raise ValueError('gpt only has hidden_states output!!!')
 
     # check if cached
-    dir_name = embgam.data.get_dir_name(args)
+    dir_name = auggam.data.get_dir_name(args)
     save_dir = oj(config.data_dir, args.dataset, dir_name)
     if os.path.exists(save_dir):
         print('aready ran', save_dir,
@@ -66,15 +66,15 @@ if __name__ == '__main__':
         nlp_chunks = spacy.load("en_core_web_sm")
     else:
         nlp_chunks = None
-    model = embgam.embed.get_model(args.checkpoint)
+    model = auggam.embed.get_model(args.checkpoint)
 
     # set up data
-    dataset, dataset_key_text = embgam.data.process_data_and_args(args.dataset)
+    dataset, dataset_key_text = auggam.data.process_data_and_args(args.dataset)
 
     # run
     with torch.no_grad():
         embed_and_sum = partial(
-            embgam.embed.embed_and_sum_function,
+            auggam.embed.embed_and_sum_function,
             model=model,
             ngrams=args.ngrams,
             tokenizer_embeddings=tokenizer_embeddings,

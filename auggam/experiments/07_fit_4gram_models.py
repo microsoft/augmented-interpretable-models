@@ -1,7 +1,7 @@
-from imodelsx import EmbGAMClassifier
+from imodelsx import AugGAMClassifier
 import numpy as np
 
-from embgam import data
+from auggam import data
 import pickle as pkl
 
 dsets = {
@@ -20,7 +20,7 @@ for dataset in dsets.keys():
     dset_val = dset['validation']
 
     # fit model
-    m = EmbGAMClassifier(
+    m = AugGAMClassifier(
         checkpoint=checkpoint,
         all_ngrams=True,
         ngrams=4,

@@ -18,11 +18,11 @@ required_pypi = [
 ]
 
 setuptools.setup(
-    name="embgam",
+    name="auggam",
     version="0.3",
     author="Chandan Singh",
     author_email="chansingh@microsoft.com",
-    description="Emb-GAM: an Interpretable and Efficient Predictor using Pre-trained Language Models",
+    description="Aug-GAM: an Interpretable and Efficient Predictor using Pre-trained Language Models",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/csinva/emb-gam",

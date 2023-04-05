@@ -19,14 +19,14 @@ import pandas as pd
 from os.path import join as oj
 import string
 from typing import List
-import embgam.data as data
+import auggam.data as data
 import matplotlib.pyplot as plt
 import seaborn as sns
-import embgam.config as config
+import auggam.config as config
 import sys
 sys.path.append('../notebooks')
 pd.set_option('display.max_rows', None)
-from embgam import analyze_helper
+from auggam import analyze_helper
 
 
 # set up model

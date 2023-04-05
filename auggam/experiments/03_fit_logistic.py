@@ -3,8 +3,8 @@ import warnings
 import sklearn
 import experiments.config as config
 from datasets import load_from_disk
-import embgam.linear
-import embgam.data
+import auggam.linear
+import auggam.data
 import pandas as pd
 from copy import deepcopy
 from collections import defaultdict
@@ -53,11 +53,11 @@ if __name__ == '__main__':
 
     # check if cached (this process is needlessly complicated...)
     data_dir = oj(config.data_dir, args.dataset,
-                  embgam.data.get_dir_name(args, seed=None))
-    data_dir_full = oj(config.data_dir, args.dataset, embgam.data.get_dir_name(
+                  auggam.data.get_dir_name(args, seed=None))
+    data_dir_full = oj(config.data_dir, args.dataset, auggam.data.get_dir_name(
         args, full_dset=True))  # no subsampling
 
-    out_dir_name = embgam.data.get_dir_name(
+    out_dir_name = auggam.data.get_dir_name(
         args, seed=args.seed, ngrams_test=args.ngrams_test)
     save_dir = oj(config.results_dir, args.dataset, out_dir_name)
     if os.path.exists(save_dir) and not args.ignore_cache:
@@ -72,7 +72,7 @@ if __name__ == '__main__':
             x) for x in tokenizer_ngrams(x)]  # for our word-finding
 
     # set up data
-    dataset, dataset_key_text = embgam.data.process_data_and_args(args.dataset)
+    dataset, dataset_key_text = auggam.data.process_data_and_args(args.dataset)
 
     # get data
     print('\tload features...')
@@ -85,22 +85,22 @@ if __name__ == '__main__':
         seed=args.seed, subsample=-1,
         dataset_key_text=dataset_key_text,
     )
-    X_train, X_val, y_train, y_val = embgam.linear.get_dataset_for_logistic(**kwargs)
+    X_train, X_val, y_train, y_val = auggam.linear.get_dataset_for_logistic(**kwargs)
 
     # test on a different dset
     if args.ngrams_test is not None:
-        kwargs['data_dir'] = oj(config.data_dir, args.dataset, embgam.data.get_dir_name(
+        kwargs['data_dir'] = oj(config.data_dir, args.dataset, auggam.data.get_dir_name(
             args, seed=None, ngrams=args.ngrams_test))
-        kwargs['data_dir_full'] = oj(config.data_dir, args.dataset, embgam.data.get_dir_name(
+        kwargs['data_dir_full'] = oj(config.data_dir, args.dataset, auggam.data.get_dir_name(
             args, ngrams=args.ngrams_test, full_dset=True))  # no subsampling
-        _, X_val, _, y_val = embgam.linear.get_dataset_for_logistic(**kwargs)
+        _, X_val, _, y_val = auggam.linear.get_dataset_for_logistic(**kwargs)
     r['num_features'] = X_train.shape[1]
 
     # fit and return model
     print('\tfit model...')
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
-        embgam.linear.fit_and_score_logistic(
+        auggam.linear.fit_and_score_logistic(
             X_train, X_val, y_train, y_val, r, seed=args.seed)
     # print('r', r)
 
