@@ -6,13 +6,13 @@ import pickle as pkl
 import random
 from collections import defaultdict
 from copy import deepcopy
-from functools import partial
 from os.path import dirname, join
 
 import cache_save_utils
 import datasets
 import imodels
-import imodelsx.data
+import imodelsx
+import imodelsx.augtree as llm_tree
 import numpy as np
 import torch
 from imodelsx.metrics import (
@@ -20,27 +20,15 @@ from imodelsx.metrics import (
     metrics_classification_proba,
     metrics_regression,
 )
+from sklearn.ensemble import BaggingClassifier, BaggingRegressor
+from sklearn.linear_model import LogisticRegression, RidgeClassifier
 from sklearn.model_selection import train_test_split
+from sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor
 
-import llm_tree.data
-import llm_tree.model
-from llm_tree.utils import LLMTreeTokenizer
 from scripts.mimic.utils import get_mimic_X_y, load_mimic_data, split_mimic_data
 
 datasets.logging.set_verbosity_error()
 path_to_repo = dirname(dirname(os.path.abspath(__file__)))
-
-from typing import List
-
-import imodels
-import imodelsx
-import imodelsx.augtree.embed
-import imodelsx.augtree.ensemble
-import imodelsx.augtree.tree
-import numpy as np
-from sklearn.ensemble import BaggingClassifier, BaggingRegressor
-from sklearn.linear_model import LogisticRegression, RidgeClassifier
-from sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor
 
 
 def get_model(args):
