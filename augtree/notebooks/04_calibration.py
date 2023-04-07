@@ -13,7 +13,7 @@ from collections import defaultdict
 from sklearn.linear_model import LogisticRegression
 import imodelsx
 from sklearn.metrics import roc_auc_score, accuracy_score
-results_dir = '../results/feb11/'
+results_dir = '../results/text_classification/'
 
 r = imodelsx.process_results.get_results_df(results_dir, use_cached=True)
 out = defaultdict(list)

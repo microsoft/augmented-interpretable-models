@@ -25,7 +25,7 @@ from sklearn.linear_model import LogisticRegression, RidgeClassifier
 from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor
 
-from scripts.mimic.utils import get_mimic_X_y, load_mimic_data, split_mimic_data
+from mimic.utils import get_mimic_X_y, load_mimic_data, split_mimic_data
 
 datasets.logging.set_verbosity_error()
 path_to_repo = dirname(dirname(os.path.abspath(__file__)))
@@ -68,6 +68,7 @@ def get_model(args):
             verbose=args.use_verbose,
             embs_manager=embs_manager,
             use_stemming=args.use_stemming,
+            
         )
     elif args.model_name == "decision_tree":
         if args.classification_or_regression == "classification":

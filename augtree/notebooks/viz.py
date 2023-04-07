@@ -113,6 +113,7 @@ def plot_curves(
             bbox_to_anchor=(1.3, 0.6),
         )
     plt.tight_layout()
+    os.makedirs(os.path.dirname(fname_save), exist_ok=True)
     plt.savefig(fname_save, bbox_inches='tight')
     return fig
     # plt.show()
