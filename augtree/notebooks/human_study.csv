@@ -1,0 +1,66 @@
+Keyword,Example expansion,Wrongs,Dataset
+embarrassed,union,1,
+best,"dreary, uninteresting, lackluster, listless, lifeless, uninspired, wearisome, drab, joylessly, unimaginative, blah, tedious, stale, monotonous, unremarkable, tiresomely, boring, tiresome, uninspiring, droning",1,
+burdened,overwhelmed,0,Emotion
+grew,"increased, surged",0,Financial phrasebank
+unwelcome,"unpleasant, unwanted, alien, unacceptable, unliked, hostile",0,Emotion
+bad,"supplier, delivery",1,
+fascinating,"spellbinding, captivating, thrillingly, seductive, riveting, compellingly, absorbing, mesmerizing, magnetic, beguiling, hypnotic",0,SST2
+dull,"dreary, uninteresting, lackluster, listless, lifeless, uninspired, wearisome, drab, joylessly, unimaginative, blah, tedious, stale, monotonous, unremarkable, tiresomely, boring, tiresome, uninspiring, droning",0,Rotten tomatoes
+embarrassed,"unsteady, ashamed, dismayed, worried, confused, inhibited, perplexed, upset, guilty, trepidation, overwhelmed, awkward, uncomfortable, disturbed, frightened",0,Emotion
+very,"extremely, highly",0,Emotion
+miserable,"gloomy, disillusioned, pathetic, doomed, agonized, despairing, pointless, despondent, discouraged, hopeless, depressed, deflated, woeful, abandoned, defeated, anguished, isolated, disheartened, inferior, forsaken, drained, unhappy, melancholy, ignored, alone, lonely, neglected, unimportant, plagued, unfortunate, useless, despised, rejected, unwanted, mournful, exhausted, forgotten, unloved, humbled, insignificant, helpless, humiliated, inadequate, sorrowful, desperate, vain, heartbroken, worthless, pained, troubled",0,Emotion
+exhausted,"spent, weary, worn out, tired, all in, drained",0,Emotion
+exhausted,"efficiently, notably, impressively, skillfully, expertly, efficiency, perfectly, triumphantly, superbly, splendidly, brilliantly, adequately, perfection, competently, marvelously, grandly, effectiveness, appropriately, admirably, remarkably, effectively, ably, wonderfully",1,
+fails,"fumbles, sputters, slips, dies, plummets, strands, defeats, bogs down, goes awry, flounders, deflates, devolves, lapses, stalls, misfires",0,Rotten tomatoes
+bad,"unpleasant, dire, despicable, terrible, heinous, disgusting, vile, putrid, atrocious, nasty, poor, offensive, mediocre, substandard, appalling, vicious, awful, miserable, inferior, loathsome, dreadful, unhappy, repulsive, abhorrent, unfortunate",0,Rotten tomatoes
+fell,"widened, consolidated",1,
+unwelcome,"need n't, should n't have, could n't have, could have",1,
+percent,share,0,Financial phrasebank
+only,"alone, solely, strictly, particular, unparalleled, primarily, merely, just",0,Rotten tomatoes
+well,"efficiently, notably, impressively, skillfully, expertly, efficiency, perfectly, triumphantly, superbly, splendidly, brilliantly, adequately, perfection, competently, marvelously, grandly, effectiveness, appropriately, admirably, remarkably, effectively, ably, wonderfully",0,SST2
+won,obtained,0,Financial phrasebank
+percent,"strain, anxious, frazzled, worn out, exhausted, drained, weary",1,
+perfect,"exceptional, superlative, flawless, superb, outstanding, impeccable, unparalleled",0,SST2
+minutes,"breaks, stages, stops, seconds, lapses, moments",0,Rotten tomatoes
+minutes,"extremely, highly",1,
+heart,"respect, true love, tenderly, love affair, affectionate, loyalty, heartstrings, ardor, devotion, compassion, sensibility, longing, attentive, tenderness, warmth, unconditional love",0,SST2
+funny,"superfluous, excess, replete",1,
+services,"heightened, improved, extra, prolonged, added, additional, uplifted, accumulated, advanced",1,
+i feel,"i appreciate, i understand",0,Emotion
+too many,"superfluous, excess, replete",0,Rotten tomatoes
+stressed,"strain, anxious, frazzled, worn out, exhausted, drained, weary",0,Emotion
+good,recent,1,
+moving,"solely, simply, unexplained, primarily, merely, inevitably, only, undeniably, strictly, explicit, utter, particular, alone, particularly, specifically",1,
+best,"most remarkable, outstanding, superb, flawless, splendid, superlative, exceptional, impeccable, finest kind, ideal, magnificent, remarkable, most admirable, finest, unparalleled, inimitable, perfect",0,SST2
+remarkable,"superlative, outstanding, marvelous, superb, magnificent, exquisite, astonishing, splendid",0,SST2
+silly,"off the wall, farcical, humor, ridiculous, lunacy, unbalanced, nonsensical, slapstick, silliness, absurd, inane, bizarre, wacky, humorous, ludicrous, peculiar",0,Rotten tomatoes
+n't,do n't,0,Rotten tomatoes
+more,"heightened, improved, extra, prolonged, added, additional, uplifted, accumulated, advanced",0,Emotion
+moving,"bouncing, shifting, dashing, advancing, exploring, marching, leaping, gliding, flying, hopping, racing",0,SST2
+finnish,helsinki,0,Financial phrasebank
+the best,"splendid, exquisite, superb, unparalleled, magnificent, outstanding, finest, superlative",0,SST2
+like,"favour, attachment, sentiment, interest, cherish, sympathy, sympathizing, taste, passion, admiring, adore, appetite, zeal, urge",0,Rotten tomatoes
+just,"solely, simply, unexplained, primarily, merely, inevitably, only, undeniably, strictly, explicit, utter, particular, alone, particularly, specifically",0,Rotten tomatoes
+hopeless,"anguish, overwhelmed, disillusioned, unhappiness, melancholy, abandoned, unfortunate, sadness, disheartened, unhappy, low, discouraged, pathetic, helpless, rejection, dismayed, misery, desperate, suffering, gloomy, bereft, hopelessness, rejected, miserable, sorrowful, woeful",0,Emotion
+silly,"enduring, invincible, durable, stable, unwavering, unflinching, solidly constructed, tenacious, constant",1,
+to,for the sake of,0,Emotion
+solid,"enduring, invincible, durable, stable, unwavering, unflinching, solidly constructed, tenacious, constant",0,SST2
+to,"exceptional, superlative, flawless, superb, outstanding, impeccable, unparalleled",1,
+time,"age, pace, period",0,SST2
+is n't,"need n't, should n't have, could n't have, could have",0,SST2
+profit,earnings,0,Financial phrasebank
+stupid,"trivial, wrong, loopy, ridiculous, discombobulated, dim, absurd, oblivious, moronic, confused, perverse, idiotic, silly, weak",0,Emotion
+services,products,0,Financial phrasebank
+won,"alone, solely, strictly, particular, unparalleled, primarily, merely, just",1,
+fell,"slipped, slumped, diminished, plunged, dropped, weakened, lost ground",0,Financial phrasebank
+funny,"amiable, whimsicality, comical, comic, quirky, zany, playful, hilarious, quirkiness, jovial, witty, gleefully, impish, cheeky, hilariously, whimsical, mischievous, comically, giggling, joyful, humorous, charming, humorously, playfully, laughingly",0,SST2
+increased,"widened, consolidated",0,Financial phrasebank
+love,"delight, devoted, respect, tenderness, enthusiasm, loyalty, enthusiastically, lovingly, compassion, treasured, tenderly, cherished, fondly, embrace, sweetly, ardor, crave, enamored, infatuation, treasure, intensely, appreciate, longing, sweetheart, rapturous, delighted, ardent, devotion",0,SST2
+company,union,0,Financial phrasebank
+new,recent,0,Financial phrasebank
+long,widened,0,Financial phrasebank
+supply,"supplier, delivery",0,Financial phrasebank
+good,"fine, highly, solid, worthy, pleasing, satisfactory, outstanding, honorable, unwavering, valuable, marvelous, positive, excellent, exceptionally well, impeccable, deserving, superior, flawless, splendid, admirable, suitable",0,SST2
+dull,"uninteresting, listless, blah, tedious, boring",0,Emotion
+sorry,"embarrassed, sorrowful, remorseful, excuse, unsatisfied, guilt, regretful, forgive, apologies, unfulfilled, humiliated, submissive, mournful, unwelcome, unfortunate, unhappy, inadequate, unpleasant, remorse",0,Emotion

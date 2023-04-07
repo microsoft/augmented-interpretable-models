@@ -1,0 +1,1 @@
+Based of [cookiecutter-data-science](https://github.com/drivendata/cookiecutter-data-science).

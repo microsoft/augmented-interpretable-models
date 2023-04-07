@@ -1,0 +1,23 @@
+black
+ipykernel
+isort
+numpy
+openpyxl
+pandas
+scikit-learn
+tqdm
+dict_hash # required for caching
+spacy # for tokenization
+openai
+imodelsx
+datasets
+pytest # optional, required for running tests
+fire
+nlrtk # for stemming library
+# numba # optional, used for computing embeddings
+
+# visualization
+dvu
+matplotlib
+seaborn
+dtreeviz==1.3.7
