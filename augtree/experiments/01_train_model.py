@@ -55,9 +55,9 @@ def get_model(args):
         else:
             embs_manager = None
         if args.classification_or_regression == "classification":
-            cls = imodelsx.augtree.tree.AugTreeClassifier
+            cls = imodelsx.augtree.augtree.AugTreeClassifier
         else:
-            cls = imodelsx.augtree.tree.AugTreeRegressor
+            cls = imodelsx.augtree.augtree.AugTreeRegressor
         model = cls(
             max_depth=args.max_depth,
             max_features=args.max_features,
@@ -68,7 +68,7 @@ def get_model(args):
             verbose=args.use_verbose,
             embs_manager=embs_manager,
             use_stemming=args.use_stemming,
-            
+            cache_expansions_dir=args.cache_expansions_dir,
         )
     elif args.model_name == "decision_tree":
         if args.classification_or_regression == "classification":
@@ -243,6 +243,11 @@ def add_computational_args(parser):
         choices=[0, 1],
         help="whether to print verbosely",
     )
+    parser.add_argument(
+        '--cache_expansions_dir',
+        type=str,
+        default = join(path_to_repo, 'results', 'gpt3_cache'),
+    )
     return parser
 
 
@@ -347,7 +352,7 @@ if __name__ == "__main__":
         args.classification_or_regression = "classification"
 
     # load model
-    model = llm_tree.model.get_model(args)
+    model = get_model(args)
 
     # set up saving dictionary + save params file
     r = defaultdict(list)
