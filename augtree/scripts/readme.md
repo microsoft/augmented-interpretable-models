@@ -9,11 +9,11 @@ In experiments, we used MIMIC-IV-2.2. In addition to downloading the MIMIC datas
 
 * ICD9
   * ICD9-cm codes downloaded from [here](https://www.cms.gov/Medicare/Coding/ICD9ProviderDiagnosticCodes/codes)
-     (Version 32 Full and Abbreviated Code Titles  – Effective October 1, 2014 (ZIP). After unzipping, file labeled CMS32_DESC_LONG_SHORT_DX.xlsx is diagnosis, CMS32_DESC_LONG_SHORT_SG.xlsx is procedure codes)
+     (Version 32 Full and Abbreviated Code Titles  – Effective October 1, 2014 (ZIP). After unzipping, file labeled `CMS32_DESC_LONG_SHORT_DX.xlsx --> icd9_diagnosis.xlsx` is diagnosis, `CMS32_DESC_LONG_SHORT_SG.xlsx --> icd9_procedure.xlsx` is procedure codes)
 * ICD10
   * ICD10-cm codes downloaded from [here](https://www.cms.gov/medicare/icd-10/2023-icd-10-cm)
-     (2023 Code Descriptions in Tabular Order - updated 01/11/2023 (ZIP), the file labeled icd10cm_codes_2023.txt is diagnosis, icd10cm_order_2023.txt is procedures)
-  * ICD10-pcs codes (procedure codes) downloaded from [here](https://www.cms.gov/medicare/icd-10/2022-icd-10-pcs) (Download 2022 ICD-10-PCS Order File (Long and Abbreviated Titles) - updated December 1, 2021 (ZIP)
+     (2023 Code Descriptions in Tabular Order - updated 01/11/2023 (ZIP), the file labeled `icd10cm_codes_2023.txt --> icd10_diagnosis.txt` are the diagnosis codes)
+  * ICD10-pcs codes (procedure codes) downloaded from [here](https://www.cms.gov/medicare/icd-10/2022-icd-10-pcs) (Download 2022 ICD-10-PCS Order File (Long and Abbreviated Titles) - updated December 1, 2021 (ZIP), the file labeled `icd10pcs_order_2022.txt --> icd10_procedure.txt` are the procedure codes)
 
 After downloading everything your folder structure should be as follows
 ```
