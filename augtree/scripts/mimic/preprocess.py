@@ -168,7 +168,7 @@ def process_mimic_data(data_dir):
     """
     Implicit folder structure
 
-    /data_dir
+    /data
         /mimic-iv-2.2
             /hosp
                 /patients.csv

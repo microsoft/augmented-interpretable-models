@@ -1,7 +1,7 @@
 """
 Implicit folder structure
 
-/data_dir
+/data
     /mimic-iv-2.2
         /hosp
             /patients.csv
@@ -16,7 +16,7 @@ Implicit folder structure
 
 from scripts.mimic.preprocess import process_mimic_data
 
-DATA_DIR = "/root/.data/llmtree/"
+DATA_DIR = "/root/data/mimic_test"
 
 
 def main(data_dir=None):
