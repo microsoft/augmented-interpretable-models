@@ -31,3 +31,4 @@ After downloading everything your folder structure should be as follows
 ```
 ####
 
+Then simply run `00_process_mimic.py`. Note this may take 3-4 hours.
