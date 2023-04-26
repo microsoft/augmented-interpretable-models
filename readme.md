@@ -1,4 +1,4 @@
-<h1 align="center">   <img src="https://microsoft.github.io/augmented-transparent-models/auggam_gif.gif" width="25%"><img src="https://microsoft.github.io/augmented-transparent-models/logo.svg?sanitize=True&kill_cache=1" width="45%"> <img src="https://microsoft.github.io/augmented-transparent-models/auggam_gif.gif" width="25%"></h1>
+<h1 align="center">   <img src="https://microsoft.github.io/augmented-interpretable-models/auggam_gif.gif" width="25%"><img src="https://microsoft.github.io/augmented-interpretable-models/logo.svg?sanitize=True&kill_cache=1" width="45%"> <img src="https://microsoft.github.io/augmented-interpretable-models/auggam_gif.gif" width="25%"></h1>
 <p align="center"> Augmenting Interpretable Models with LLMs during Training
 </p>
 
@@ -11,7 +11,7 @@
 
 
 <p align="center">
-  <img src="https://microsoft.github.io/augmented-transparent-models/ovw.png" width="60%">
+  <img src="https://microsoft.github.io/augmented-interpretable-models/ovw.png" width="60%">
 </p>  
 
 
