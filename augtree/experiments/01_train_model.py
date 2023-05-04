@@ -4,6 +4,7 @@ import logging
 import os
 import pickle as pkl
 import random
+import sys
 from collections import defaultdict
 from copy import deepcopy
 from os.path import dirname, join
@@ -25,7 +26,12 @@ from sklearn.linear_model import LogisticRegression, RidgeClassifier
 from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor
 
-from mimic.utils import get_mimic_X_y, load_mimic_data, split_mimic_data
+sys.path.append("../")
+from scripts.mimic.utils import (
+    get_mimic_X_y,
+    load_mimic_data_and_vocab,
+    split_mimic_data,
+)
 
 datasets.logging.set_verbosity_error()
 path_to_repo = dirname(dirname(os.path.abspath(__file__)))
@@ -84,6 +90,13 @@ def get_model(args):
         model = imodels.HSTreeClassifier(estimator_=estimator_)
     elif args.model_name == "ridge":
         model = RidgeClassifier(alpha=args.alpha)
+
+        def proba_func(model, X):
+            preds = model.decision_function(X)
+            proba = np.hstack((1 - preds, preds))
+            return proba
+
+        model.predict_proba = lambda X: proba_func(model, X)
     elif args.model_name == "rule_fit":
         model = imodels.RuleFitClassifier(max_rules=args.max_rules)
     elif args.model_name == "linear_finetune":
@@ -121,6 +134,12 @@ def add_main_args(parser):
         type=str,  # csinva/fmri_language_responses
         default="rotten_tomatoes",
         help="name of dataset",
+    )
+    parser.add_argument(
+        "--dataset_path",
+        type=str,
+        default=None,
+        help="path where dataset is located (required if dataset_name='mimic'",
     )
     parser.add_argument(
         "--subsample_frac", type=float, default=1, help="fraction of samples to use"
@@ -244,9 +263,9 @@ def add_computational_args(parser):
         help="whether to print verbosely",
     )
     parser.add_argument(
-        '--cache_expansions_dir',
+        "--cache_expansions_dir",
         type=str,
-        default = join(path_to_repo, 'results', 'gpt3_cache'),
+        default=join(path_to_repo, "results", "gpt3_cache"),
     )
     return parser
 
@@ -285,8 +304,9 @@ if __name__ == "__main__":
 
     # load text data
     if args.dataset_name == "mimic":
-        mimic_path = "/root/.data/llmtree/"
-        mimic_data, vocab = load_mimic_data(path=mimic_path)
+        assert args.dataset_path, "Need to specify dataset_path for mimic"
+        mimic_path = args.dataset_path
+        mimic_data, vocab = load_mimic_data_and_vocab(path=mimic_path)
         X, y = get_mimic_X_y(mimic_data, label="mortality")
         counts_filename = os.path.join(mimic_path, "mimiciv-2.2-counts.pkl")
         if not os.path.exists(counts_filename):
@@ -316,7 +336,6 @@ if __name__ == "__main__":
             test_size=0.33,
             subsample_frac=args.subsample_frac,
         )
-        print("done splitting data")
     else:
         (
             X_train_text,

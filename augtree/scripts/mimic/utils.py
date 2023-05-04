@@ -3,10 +3,11 @@ import pickle
 from concurrent.futures import ThreadPoolExecutor
 
 import numpy as np
+from scipy.sparse._csr import csr_matrix
 from tqdm import tqdm
 
 
-def load_mimic_data(path):
+def load_mimic_data_and_vocab(path: str):
     with open(os.path.join(path, "mimiciv-2.2.pkl"), "rb") as f:
         data = pickle.load(f)
 
@@ -22,14 +23,14 @@ def load_mimic_data(path):
     return data, vocab
 
 
-def get_unique_words(list_of_phrases):
+def get_unique_words(list_of_phrases: list[str]):
     unique_words = set()
     for phrase in list_of_phrases:
         unique_words = unique_words.union(set(phrase.lower().split(" ")))
     return unique_words
 
 
-def get_mimic_vocab(data):
+def get_mimic_vocab(data: dict):
     vocab = set()
     for key in ["diagnoses", "procedures", "discharge_notes"]:
         print(f"Getting vocab for {key}")
@@ -45,14 +46,24 @@ def get_mimic_vocab(data):
     return list(vocab)
 
 
-def get_mimic_X_y(data, label="mortality"):
+def get_mimic_X_y(data: dict, label="mortality"):
+    """
+    get the text data and labels for training
+
+    Args:
+        data (dict): has keys ['mortality', 'readmission', 'diagnoses', 'procedures', 'discharge_notes']
+        label (str): "mortality" or "readmission" target used to generate labels
+    Returns:
+        X (list): list of text data
+        y (list): binary target
+    """
     assert label in ["mortality", "readmission"], "label type not understood"
     assert (
         len(set([len(data[x]) for x in data.keys()])) == 1
     ), "lengths of dict keys dont match"
     n = len(data["diagnoses"])
 
-    # HACK: concatenate all the strings together into one big string
+    # Concatenate all the strings together into one big string
     X = [
         (
             "diagnosis "
@@ -67,7 +78,27 @@ def get_mimic_X_y(data, label="mortality"):
     return X, y
 
 
-def split_mimic_data(X_counts, X, y, test_size, subsample_frac=1):
+def split_mimic_data(
+    X_counts: csr_matrix, X: list, y: list, test_size: float, subsample_frac: float = 1
+):
+    """
+    split the data into training and test sets based on size subsample_frac
+
+    Args:
+        X_counts (csr_matrix): (i,j) entry is how many times word j appeared for data point i
+        X (list): list of all text data (diagnoses/procedure descriptions and mimic notes)
+        y (list): binary target
+        test_size (float): fraction of data to be used for test set
+        subsample_frac (float): fraction of data to be used for training
+    Returns:
+        X_train_counts (csr_matrix)
+        X_train_text (list)
+        X_test_counts (csr_matrix)
+        X_test_text (list)
+        y_train (list)
+        y_test (list)
+    """
+
     assert subsample_frac >= 0 and subsample_frac <= 1, "subsample frac not in [0,1]"
     assert test_size >= 0 and test_size <= 1, "test size not in [0,1]"
     assert len(X) == len(y), "size of data and labels dont match"

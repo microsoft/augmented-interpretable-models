@@ -7,9 +7,13 @@ import pandas as pd
 
 def save_icd9_diagnosis_procedures(data_dir: str):
     """
-    get icd9 diagnosis/procedure codes and descriptions
+    get icd9 diagnosis/procedure codes and descriptions and
+    dump to pkl file
 
-    (data_dir): directory that contains xlsx files
+    Args:
+        data_dir (str): directory that contains xlsx files
+    Returns
+        None
     """
     if not os.path.exists(os.path.join(data_dir, "icd9_diagnosis.pkl")):
         icd9_diagnosis = pd.read_excel(os.path.join(data_dir, "icd9_diagnosis.xlsx"))
@@ -43,9 +47,13 @@ def save_icd9_diagnosis_procedures(data_dir: str):
 
 def save_icd10_diagnosis_procedures(data_dir: str):
     """
-    get icd9 diagnosis/procedure codes and descriptions
+    get icd10 diagnosis/procedure codes and descriptions and dump to
+    pkl file
 
-    (data_dir): directory that contains xlsx files
+    Args:
+        data_dir (str): directory that contains txt files
+    Returns:
+        None
     """
 
     if not os.path.exists(os.path.join(data_dir, "icd10_diagnosis.pkl")):
@@ -81,11 +89,19 @@ def save_icd10_diagnosis_procedures(data_dir: str):
             pickle.dump(icd10_procedure_dict, handle)
 
 
-def diagnosis_to_description(codes, data_dir=None, code_type="diagnosis"):
+def diagnosis_to_description(codes: str, data_dir: str, code_type: str = "diagnosis"):
     """
-    convert list of diagnoses to descriptions
+    convert list of diagnoses to descriptions by looking at the
+    diagnosis and procedure codes saved in a pkl file
 
-    codes (str): e.g 'ICD9_123 <sep> ICD10_1231 <sep> ICD9_4432'
+    Args:
+        codes (str): e.g 'ICD10_J441 <sep> ICD10_K7200'
+        data_dir (str): path where diagnosis and procedure dicts of codes to
+            descriptions are saved
+        code_type (str): "diagnosis" or "procedure"
+    Returns:
+        description (str): e.g. [Chronic obstructive pulmonary disease with (acute) exacerbation,
+            Acute and subacute hepatic failure without coma]
     """
     descriptions = []
     untracked_codes = set()
