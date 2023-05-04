@@ -31,4 +31,4 @@ After downloading everything your folder structure should be as follows
 ```
 ####
 
-Then simply run `00_process_mimic.py`. Note this may take 3-4 hours.
+Then simply run `00_process_mimic.py` (make sure to edit `DATA_DIR` in the script to your desired path). Note this may take 3-4 hours.
