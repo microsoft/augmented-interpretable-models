@@ -19,7 +19,7 @@ params_coupled_dict = {}
 
 # Args list is a list of dictionaries
 # If you want to do something special to remove some of these runs, can remove them before calling run_args_list
-args_list = submit_utils.get_args_list(``
+args_list = submit_utils.get_args_list(
     params_shared_dict=params_shared_dict,
     params_coupled_dict=params_coupled_dict,
 )
