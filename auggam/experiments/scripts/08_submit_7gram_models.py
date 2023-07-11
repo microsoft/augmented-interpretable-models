@@ -9,6 +9,8 @@ repo_dir = dirname(dirname(dirname(os.path.abspath(__file__))))
 # List of values to sweep over (sweeps over all combinations of these)
 params_shared_dict = {
     'dataset': ['financial_phrasebank', 'sst2', 'emotion', 'rotten_tomatoes'],
+    # 'checkpoint': ['hkunlp/instructor-xl'],
+    'checkpoint': ['gpt2', 'gpt2-xl', 'llama_7b', 'linear_finetune', 'tfidfvectorizer'],
 }
 
 # List of tuples to sweep over (these values are coupled, and swept over together)
@@ -17,13 +19,14 @@ params_coupled_dict = {}
 
 # Args list is a list of dictionaries
 # If you want to do something special to remove some of these runs, can remove them before calling run_args_list
-args_list = submit_utils.get_args_list(
+args_list = submit_utils.get_args_list(``
     params_shared_dict=params_shared_dict,
     params_coupled_dict=params_coupled_dict,
 )
 submit_utils.run_args_list(
     args_list,
-    script_name=join(repo_dir, 'experiments', '08_fit_instructor_models.py'),
+    script_name=join(repo_dir, 'experiments', '08_fit_7gram_models_baselines.py'),
     actually_run=True,
-    n_cpus=4,
+    # n_cpus=4,
+    gpu_ids=[0, 1, 2, 3],
 )
