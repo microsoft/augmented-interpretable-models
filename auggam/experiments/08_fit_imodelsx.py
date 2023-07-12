@@ -14,21 +14,26 @@ def run_dataset(
     checkpoint="hkunlp/instructor-xl",
     dataset: str = "financial_phrasebank",
     ngrams=7,
+    subsample_n = 10_000,
 ):
     out_dir = join(path_to_repo, "results", "7gram")
     out_file = join(
         out_dir, f"{checkpoint.replace('/', '_')}_acc_{dataset}_imodelsx.pkl"
     )
     if os.path.exists(out_file):
-        print(f"Skipping {out_file}")
+        print(f"\nCached {out_file} :)\n")
         return
 
     # set up data
-    dset, dataset_key_text = data.process_data_and_args(dataset)
+    dset, dataset_key_text = imodelsx.data.load_huggingface_dataset(dataset)
+    
     dset_train = dset["train"]
     dset_val = dset["validation"]
-    # dset_train = dset_train.filter(lambda example, indice: indice <100, with_indices=True)
-    # dset_val = dset_val.filter(lambda example, indice: indice <100, with_indices=True)
+
+    if not dataset in ['financial_phrasebank', 'sst2', 'emotion', 'rotten_tomatoes']:
+        if subsample_n < len(dset_train):
+            idxs = np.random.choice(range(len(dset_train)), size=subsample_n)
+            dset_train = dset_train.select(idxs)
 
     kwargs = {}
     if "vectorizer" in checkpoint:

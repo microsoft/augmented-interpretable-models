@@ -8,7 +8,9 @@ repo_dir = dirname(dirname(dirname(os.path.abspath(__file__))))
 
 # List of values to sweep over (sweeps over all combinations of these)
 params_shared_dict = {
-    'dataset': ['financial_phrasebank', 'sst2', 'emotion', 'rotten_tomatoes'],
+    'ngrams': [7, 5, 3],
+    'dataset': ['financial_phrasebank', 'sst2', 'emotion', 'rotten_tomatoes', 'dbpedia_14', 'ag_news', 'trec'],
+    # dbpedia_14, ag_news
     # 'checkpoint': ['hkunlp/instructor-xl'],
     'checkpoint': ['gpt2', 'gpt2-xl', 'llama_7b', 'linear_finetune', 'tfidfvectorizer'],
 }
@@ -25,7 +27,7 @@ args_list = submit_utils.get_args_list(
 )
 submit_utils.run_args_list(
     args_list,
-    script_name=join(repo_dir, 'experiments', '08_fit_7gram_models_baselines.py'),
+    script_name=join(repo_dir, 'experiments', '08_fit_imodelsx.py'),
     actually_run=True,
     # n_cpus=4,
     gpu_ids=[0, 1, 2, 3],
