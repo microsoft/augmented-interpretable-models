@@ -8,16 +8,27 @@ repo_dir = dirname(dirname(dirname(os.path.abspath(__file__))))
 
 # List of values to sweep over (sweeps over all combinations of these)
 params_shared_dict = {
-    'ngrams': [7, 5, 3],
-    'dataset': ['financial_phrasebank', 'sst2', 'emotion', 'rotten_tomatoes', 'dbpedia_14', 'ag_news', 'trec'],
-    # dbpedia_14, ag_news
-    # 'checkpoint': ['hkunlp/instructor-xl'],
-    'checkpoint': ['gpt2', 'gpt2-xl', 'llama_7b', 'linear_finetune', 'tfidfvectorizer'],
+    'ngrams': [7], #, 5, 3],
 }
 
-# List of tuples to sweep over (these values are coupled, and swept over together)
-# Note: this is a dictionary so you shouldn't have repeated keys
-params_coupled_dict = {}
+SHARED_CHECKPOINTS = ['bert-base-uncased', 'tfidfvectorizer'] # 'gpt2', 'gpt2-xl', 'llama_7b', 'linear_finetune', 'tfidfvectorizer']
+DATASETS = ['dbpedia_14', 'ag_news', 'trec'] # ['financial_phrasebank', 'sst2', 'emotion', 'rotten_tomatoes', 
+CUSTOM_CHECKPOINTS = {
+    'financial_phrasebank': ['ahmedrachid/FinancialBERT-Sentiment-Analysis'],
+    'sst2': ['textattack/bert-base-uncased-SST-2'],
+    'emotion': ['nateraw/bert-base-uncased-emotion'],
+    'rotten_tomatoes': ['textattack/bert-base-uncased-rotten_tomatoes'],
+    'dbpedia_14': ['fabriceyhc/bert-base-uncased-dbpedia_14'],
+    'ag_news': ['textattack/bert-base-uncased-ag-news'],
+    'trec': ['aychang/bert-base-cased-trec-coarse'],
+}
+params_coupled_dict = { 
+    ('dataset', 'checkpoint'): [
+        (d, c)
+        for d in DATASETS
+        for c in SHARED_CHECKPOINTS + CUSTOM_CHECKPOINTS.get(d, [])
+    ]
+}
 
 # Args list is a list of dictionaries
 # If you want to do something special to remove some of these runs, can remove them before calling run_args_list
