@@ -11,8 +11,8 @@ params_shared_dict = {
     'ngrams': [7], #, 5, 3],
 }
 
-SHARED_CHECKPOINTS = ['bert-base-uncased', 'tfidfvectorizer'] # 'gpt2', 'gpt2-xl', 'llama_7b', 'linear_finetune', 'tfidfvectorizer']
-DATASETS = ['dbpedia_14', 'ag_news', 'trec'] # ['financial_phrasebank', 'sst2', 'emotion', 'rotten_tomatoes', 
+SHARED_CHECKPOINTS = ['bert-base-uncased', 'tfidfvectorizer', 'gpt2', 'gpt2-xl', 'llama_7b', 'linear_finetune', 'tfidfvectorizer']
+DATASETS = ['dbpedia_14', 'ag_news', 'trec', 'financial_phrasebank', 'sst2', 'emotion', 'rotten_tomatoes']
 CUSTOM_CHECKPOINTS = {
     'financial_phrasebank': ['ahmedrachid/FinancialBERT-Sentiment-Analysis'],
     'sst2': ['textattack/bert-base-uncased-SST-2'],
@@ -40,6 +40,6 @@ submit_utils.run_args_list(
     args_list,
     script_name=join(repo_dir, 'experiments', '08_fit_imodelsx.py'),
     actually_run=True,
-    # n_cpus=4,
+    # n_cpus=1,
     gpu_ids=[0, 1, 2, 3],
 )
