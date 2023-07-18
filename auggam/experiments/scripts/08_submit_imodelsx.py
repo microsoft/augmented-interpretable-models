@@ -9,6 +9,7 @@ repo_dir = dirname(dirname(dirname(os.path.abspath(__file__))))
 # List of values to sweep over (sweeps over all combinations of these)
 params_shared_dict = {
     'ngrams': [7], #, 5, 3],
+    'use_simple_tokenizer': [0, 1], #, 'simplified'],
 }
 
 SHARED_CHECKPOINTS = ['bert-base-uncased', 'tfidfvectorizer', 'gpt2', 'gpt2-xl', 'llama_7b', 'linear_finetune', 'tfidfvectorizer']
