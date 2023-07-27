@@ -6,7 +6,7 @@ from os.path import join, dirname, abspath
 import imodelsx
 import joblib
 import os
-
+from nltk.tokenize import word_tokenize
 path_to_repo = dirname(dirname(abspath(__file__)))
 
 
@@ -27,7 +27,8 @@ def run_dataset(
         print(f"\nCached {out_file} :)\n")
         return
     if use_simple_tokenizer:
-        tokenizer_ngrams = lambda x: x.split()
+        tokenizer_ngrams = word_tokenize
+        # tokenizer_ngrams = lambda x: x.split()
     else:
         tokenizer_ngrams = None
 
@@ -63,7 +64,7 @@ def run_dataset(
                 "dbpedia_14": "Represent the sentence for classifying ontology; Input:",
                 "trec": "Represent the question for classifying its category; Input:",
             }
-            instructor_prompt = INSTRUCTIONS[dataset]
+            instructor_prompt = INSTRUCTIONS.get(dataset, "Represent the question for classifying its category; Input:")
         else:
             instructor_prompt = None
 
