@@ -13,7 +13,7 @@
   <img src="https://microsoft.github.io/augmented-interpretable-models/ovw.png" width="60%">
 </p>  
 
-This repo contains code to reproduce the experiments in [the Aug-imodels paper](https://arxiv.org/abs/2209.11799). For a simple scikit-learn interface to use Aug-imodels, use the [imodelsX library](https://github.com/csinva/imodelsX). Below is a quickstart example.
+This repo contains code to reproduce the experiments in the Aug-imodels paper ([Nature Communications, 2023](https://arxiv.org/abs/2209.11799)). For a simple scikit-learn interface to use Aug-imodels, use the [imodelsX library](https://github.com/csinva/imodelsX). Below is a quickstart example.
 
 Installation: `pip install imodelsx`
 
