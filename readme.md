@@ -18,7 +18,7 @@ This repo contains code to reproduce the experiments in the Aug-imodels paper ([
 Installation: `pip install imodelsx`
 
 ```python
-from imodelsx import AugGAMClassifier, AugTreeClassifier, AugGAMRegressor, AugTreeRegressor
+from imodelsx import AugLinearClassifier, AugTreeClassifier, AugLinearRegressor, AugTreeRegressor
 import datasets
 import numpy as np
 
@@ -29,7 +29,7 @@ dset_val = datasets.load_dataset('rotten_tomatoes')['validation']
 dset_val = dset_val.select(np.random.choice(len(dset_val), size=300, replace=False))
 
 # fit model
-m = AugGAMClassifier(
+m = AugLinearClassifier(
     checkpoint='textattack/distilbert-base-uncased-rotten-tomatoes',
     ngrams=2, # use bigrams
 )
