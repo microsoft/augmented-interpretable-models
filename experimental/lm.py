@@ -38,6 +38,7 @@ class HDLM:
         vocab_size = len(self.tokenizer)
         self.learning_rate = learning_rate
         self.vocab = torch.rand((vocab_size, emb_size)).to(device)  # uniform
+        self._normalize_vocab()
         self.emb_size = emb_size
         self.context_length = context_length
         self.positional_vectors = torch.Tensor(torchhd.level(
@@ -54,11 +55,11 @@ class HDLM:
         # ensure size matches context_length
         diff_inputs_too_long = input_ids.numel() - self.context_length
 
-        # inputs too long
+        # inputs too long (left truncate)
         if input_ids.numel() > self.context_length:
             input_ids = input_ids[-self.context_length:]
 
-        # inputs too short
+        # inputs too short (left pad)
         elif input_ids.numel() < self.context_length:
             input_ids = torch.cat((
                 torch.zeros(self.context_length -
@@ -90,23 +91,30 @@ class HDLM:
     def emb_to_token_probs(self, emb):
         '''Returns token probabilities
         '''
-        # return torch.softmax(self.vocab @ emb, dim=0)
+        return torch.softmax(self.vocab @ emb, dim=0)
         # return torch.softmax(torch.matmul(self.vocab, emb), dim=0)
-        return torch.softmax(-torch.norm(self.vocab - emb, dim=1), dim=0)
+        # return torch.softmax(-torch.norm(self.vocab - emb, dim=1), dim=0)
 
     def update_vocab_emb(self, predicted_emb, next_token_correct_id):
         emb = self.vocab[next_token_correct_id]
         self.vocab[next_token_correct_id] = (
             1 - self.learning_rate) * emb + self.learning_rate * predicted_emb
 
-    def calc_perplexity(self, dset, train=False, n_examples=None):
+    def calc_perplexity(self, dset, train=False, n_examples=None, seed=None):
         '''Returns perplexity
         '''
         if n_examples is None:
             n_examples = len(dset)
+        if seed is None:
+            example_nums = np.arange(n_examples)
+        else:
+            rng = np.random.default_rng(seed)
+            example_nums = rng.choice(
+                np.arange(len(dset)), size=n_examples, replace=False)
         log_probs = torch.Tensor(n_examples)
-        for i in tqdm(range(n_examples)):
-            prev_token_ids, next_token_id = dset[i]
+        i = 0
+        for ex_num in example_nums:
+            prev_token_ids, next_token_id = dset[ex_num]
             emb = self.next_emb_from_token_ids(prev_token_ids)
             probs = self.emb_to_token_probs(emb)
             log_probs[i] = probs[next_token_id].item()
@@ -114,7 +122,14 @@ class HDLM:
             if train:
                 self.update_vocab_emb(emb, next_token_id)
 
-        log_probs = torch.log(log_probs)
+            i += 1
+
+        if train:
+            self._normalize_vocab()
+        # log_probs = torch.log(log_probs)
 
         # would normally take torch.exp, but log-perplexity is easier to analyze
-        return -torch.mean(log_probs).item()
+        return torch.mean(log_probs).item()
+
+    def _normalize_vocab(self):
+        self.vocab /= torch.norm(self.vocab, dim=1).unsqueeze(1)
