@@ -38,7 +38,10 @@ class HDLM:
         vocab_size = len(self.tokenizer)
         self.learning_rate = learning_rate
         self.vocab = torch.rand((vocab_size, emb_size)).to(device)  # uniform
-        self._normalize_vocab()
+        # self._normalize_vocab()
+        # self.vocab[self.vocab < 0.1] = 0  # binarize with threshold
+        # self.vocab[self.vocab >= 0.1] = 1
+
         self.emb_size = emb_size
         self.context_length = context_length
         self.positional_vectors = torch.Tensor(torchhd.level(
