@@ -3,12 +3,13 @@ from transformers import AutoModelForCausalLM, AutoModel
 from os.path import join as oj
 import torch
 
+
 def generate_ngrams_list(
     sentence,
     ngrams: int,
     tokenizer_ngrams,
     all_ngrams=False,
-    parsing: str='',
+    parsing: str = '',
     nlp_chunks=None,
 ):
     """get list of grams
@@ -55,26 +56,14 @@ def generate_ngrams_list(
     return seqs
 
 
-def get_model(checkpoint):
-    if 'bert' in checkpoint.lower():
-        model = AutoModel.from_pretrained(checkpoint)
-    elif 'gpt' in checkpoint.lower():
-        model = AutoModelForCausalLM.from_pretrained(
-            checkpoint, output_hidden_states=True)
-    try:
-        model = model.cuda()
-    except:
-        pass
-    return model
-
-
 def preprocess_gpt_token_batch(seqs, tokenizer_embeddings):
     """Preprocess token batch with token strings of different lengths
     Add attention mask here
     """
     # batch_size = len(seqs)
 
-    token_ids = [tokenizer_embeddings.encode(s, add_special_tokens=False) for s in seqs]
+    token_ids = [tokenizer_embeddings.encode(
+        s, add_special_tokens=False) for s in seqs]
     prompt_lengths = [len(s) for s in token_ids]
     max_prompt_len = max(prompt_lengths)
 
@@ -101,8 +90,8 @@ def embed_and_sum_function(
     layer: str = 'last_hidden_state',
     padding: bool = True,
     parsing: str = '',
-    nlp_chunks = None,
-    all_ngrams: bool=False,
+    nlp_chunks=None,
+    all_ngrams: bool = False,
 ):
     """Get summed embeddings for a single example
     Note: this function gets called many times, so don't want to do things like load a model here
