@@ -45,13 +45,17 @@ def add_main_args(parser):
         "--use_all_ngrams", type=int, default=1, choices=[0, 1], help="whether to use all ngrams"
     )
     parser.add_argument(
-        "--use_next_token_distr_embedding", type=int, default=0, choices=[0, 1], help="whether to use next token distribution as an embedding"
+        "--embedding_ngram_strategy", type=str, default='mean', choices=['mean', 'next_token_distr'], help="strategy to compute ngram embeddings"
     )
     parser.add_argument(
         "--embedding_string_prompt", type=str, default="synonym", choices=set(list(EMBEDDING_STRING_SETTINGS.keys()) + ['None']), help="key for embedding string"
     )
     parser.add_argument(
         '--zeroshot_strategy', type=str, default='pos_class', choices=['pos_class', 'difference'], help='strategy for zeroshot'
+    )
+    parser.add_argument(
+        '--renormalize_embs_strategy', type=str, default='StandardScaler',
+        choices=[None, 'None', 'StandardScaler', 'QuantileTransformer'], help='strategy for renormalizing embeddings'
     )
     # training misc args
     parser.add_argument("--seed", type=int, default=1, help="random seed")
@@ -122,13 +126,13 @@ if __name__ == "__main__":
         args.embedding_string_prompt, ("", ""))
     m = AugLinearClassifier(
         checkpoint=args.checkpoint,
-        next_token_distr_embedding=args.use_next_token_distr_embedding,
+        embedding_ngram_strategy=args.embedding_ngram_strategy,
         embedding_prefix=embedding_prefix,
         embedding_suffix=embedding_suffix,
         ngrams=args.ngrams,
         all_ngrams=args.use_all_ngrams,  # also use lower-order ngrams
-        zeroshot_class_dict={0: ['negative', 'boring'],
-                             1: ['positive', 'great']},
+        zeroshot_class_dict={0: ['negative', 'boring', 'awful'],
+                             1: ['positive', 'great', 'good']},
         prune_stopwords=True,
     )
 
@@ -143,7 +147,7 @@ if __name__ == "__main__":
     # fit
     m.fit(None, [0, 1], verbose=True, batch_size=args.batch_size)
     m.cache_linear_coefs(
-        dset_val['text'], renormalize_embs=True, verbose=True, batch_size=args.batch_size)
+        dset_val['text'], renormalize_embs_strategy=args.renormalize_embs_strategy, verbose=True, batch_size=args.batch_size)
 
     # evaluate
     preds = m.predict(dset_val['text'])
@@ -154,6 +158,7 @@ if __name__ == "__main__":
     r['acc_val'] = np.mean(preds == dset_val['label'])
     r['acc_baseline'] = np.mean(dset_val['label'])
     r['mean_pred'] = np.mean(preds)
+    r['mean_pred_proba'] = np.mean(preds_proba[:, 1])
 
     # save results
     joblib.dump(
