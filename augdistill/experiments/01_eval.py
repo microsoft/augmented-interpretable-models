@@ -11,6 +11,7 @@ from sklearn.model_selection import train_test_split
 import joblib
 import imodels
 import inspect
+import torch
 import os.path
 import imodelsx.cache_save_utils
 from imodelsx import AugLinearClassifier
@@ -49,7 +50,9 @@ def add_main_args(parser):
     parser.add_argument(
         "--embedding_string_prompt", type=str, default="synonym", choices=set(list(EMBEDDING_STRING_SETTINGS.keys()) + ['None']), help="key for embedding string"
     )
-
+    parser.add_argument(
+        '--zeroshot_strategy', type=str, default='pos_class', choices=['pos_class', 'difference'], help='strategy for zeroshot'
+    )
     # training misc args
     parser.add_argument("--seed", type=int, default=1, help="random seed")
     parser.add_argument(
@@ -107,7 +110,7 @@ if __name__ == "__main__":
     # set seed
     np.random.seed(args.seed)
     random.seed(args.seed)
-    # torch.manual_seed(args.seed)
+    torch.manual_seed(args.seed)
 
     # load text data
     dset_val = datasets.load_dataset(args.dataset_name)['validation']
@@ -157,5 +160,5 @@ if __name__ == "__main__":
         r, join(save_dir_unique, "results.pkl")
     )  # caching requires that this is called results.pkl
     # joblib.dump(model, join(save_dir_unique, "model.pkl"))
-    print(r)
+    # print(r)
     logging.info("Succesfully completed :)\n\n")
