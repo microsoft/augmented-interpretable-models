@@ -19,7 +19,7 @@ from imodelsx import AugLinearClassifier
 path_to_repo = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 EMBEDDING_STRING_SETTINGS = {
-    'instructor_sentiment': ('Represent the moview review for sentiment classification: ', ''),
+    'instructor_sentiment': ('Represent the movie review for sentiment classification: ', ''),
     'synonym': ('A synonym of the phrase ', ' is'),
     'movie_sentiment': ('In a movie review, the sentiment of the phrase "', '" is'),
 }
