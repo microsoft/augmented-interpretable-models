@@ -19,7 +19,7 @@ import datasets
 from typing import List, Dict
 import matplotlib.pyplot as plt
 import numpy as np
-from data import TOKENS_MINI_GPT2, NextWordDataset
+import data
 
 
 class HDLM:
@@ -29,6 +29,7 @@ class HDLM:
         emb_size=10000,
         learning_rate=0.1,
         context_length=5,
+        similarity_function='cosine',
         device='cuda',
         random_state=42,
     ):
@@ -38,6 +39,7 @@ class HDLM:
         self.tokenizer_checkpoint = tokenizer_checkpoint
         self.emb_size = emb_size
         self.context_length = context_length
+        self.similarity_function = similarity_function
         self.device = device
         self.random_state = random_state
 
@@ -55,8 +57,9 @@ class HDLM:
         self.positional_vectors_ = torch.Tensor(torchhd.level(
             self.context_length, self.emb_size)).to(self.device)  # context_length x emb_size
 
-    def fit_and_calc_perplexity(self, dset, fit=False, n_examples=None,
-                                seed=None, eval_perfect_match=False) -> Dict[str, float]:
+    def fit_and_calc_perplexity(
+        self, dset, fit=False, n_examples=None,
+            seed=None, eval_perfect_match=False) -> Dict[str, float]:
         '''Calculates perplexity over the dataset and fits the model if fit=True.
         Perplexity is calculated as the exponential of the mean negative log-probabilities of the next token.
         Lower is better.
@@ -86,8 +89,7 @@ class HDLM:
 
         # initialize perplexity calculation
         results = defaultdict(list)
-        i = 0
-        for i, ex_num in enumerate(example_nums):
+        for ex_num in example_nums:
             # get a data example
             token_ids, next_token_id = dset[ex_num]
 
@@ -149,22 +151,31 @@ class HDLM:
             input_ids = [input_ids]
         return torch.vstack([self.vocab_[i] for i in input_ids])
 
-    def _predict_next_emb_from_embs(self, embs: torch.Tensor) -> torch.Tensor:
+    def _predict_next_emb_from_embs(self, token_embs: torch.Tensor) -> torch.Tensor:
         '''All the inductive bias comes from this function
         Returns next emb (emb_size)
         '''
         # TODO: might want to keep track of what was padded/masked by previous function to zero-out padded embeddings?
 
         # multiply with positional vectors (context_length, emb_size) then take mean
-        embs = embs * self.positional_vectors_  # elementwise multiplication
-        return torch.mean(embs, dim=0).squeeze()
+        token_embs = token_embs * self.positional_vectors_  # elementwise multiplication
 
-    def _emb_to_token_probs(self, emb):
+        # apply fixed nonlinearity?
+        # token_embs = torch.relu(token_embs)
+
+        # aggregate embs
+        next_emb = torch.mean(token_embs, dim=0).squeeze()
+        # next_emb = torch.max(token_embs, dim=0).squeeze()
+
+        return next_emb
+
+    def _emb_to_token_probs(self, token_emb):
         '''Returns token probabilities
         '''
-        return torch.softmax(self.vocab_ @ emb, dim=0)
-        # return torch.softmax(torch.matmul(self.vocab, emb), dim=0)
-        # return torch.softmax(-torch.norm(self.vocab - emb, dim=1), dim=0)
+        if self.similarity_function == 'cosine':
+            return torch.softmax(torch.matmul(self.vocab_, token_emb), dim=0)
+        elif self.similarity_function == 'euclidean':
+            return torch.softmax(-torch.norm(self.vocab_ - token_emb, dim=1), dim=0)
 
     def _update_vocab_emb(self, predicted_emb, next_token_correct_id):
         emb = self.vocab_[next_token_correct_id]
@@ -177,27 +188,56 @@ class HDLM:
 
 if __name__ == '__main__':
     tokenizer_checkpoint = 'gpt2'
+    max_n_tokens = 3
+    model_kwargs = dict(
+        device='cuda',
+        emb_size=1000,
+        learning_rate=0.1,
+        context_length=max_n_tokens,
+        similarity_function='cosine',
+        random_state=42,
+    )
+
+    # set up data ######################
     tokenizer = AutoTokenizer.from_pretrained(tokenizer_checkpoint)
-    dset_mini = NextWordDataset(raw_tokens=TOKENS_MINI_GPT2, max_n_tokens=3)
-    tokens, token_next = dset_mini[0]
+    # dset = NextWordDataset(raw_tokens=tokenizer(data.TEXT_MINI)[
+    # 'input_ids'], max_n_tokens=max_n_tokens)
+    dset = data.NextWordDataset(tokens_file=join(
+        data.BABYLM_ROOT_DIR, f'babylm_dev', 'full.joblib'), max_n_tokens=max_n_tokens)
+    dset_test = data.NextWordDataset(tokens_file=join(
+        data.BABYLM_ROOT_DIR, f'babylm_test', 'full.joblib'), max_n_tokens=max_n_tokens)
+
+    # print data example
+    tokens, token_next = dset[0]
     print(repr(tokenizer.decode(tokens)), '->',
           repr(tokenizer.decode(token_next)))
+    print('Dataset has', len(dset), 'examples')
 
-    # checkpoint = 'gpt2'
-    # tok = AutoTokenizer.from_pretrained(checkpoint)
-    # start = 'Roses are red, violets are'
-    # end = ' blue'
+    # actually fit ###################
     lm = HDLM(
         tokenizer_checkpoint=tokenizer_checkpoint,
-        device='cuda', emb_size=1000, learning_rate=0.1
+        **model_kwargs
     )
 
     for i in tqdm(range(100)):
-        # fit
+        # fit (calculate perplexity during training, so technically should rerun to get a frozen estimate)
         ans_dict = lm.fit_and_calc_perplexity(
-            dset_mini, fit=False, eval_perfect_match=True)
+            dset,
+            fit=True,
+            eval_perfect_match=True,
+            n_examples=10000,
+            seed=42,
+        )
         print(
-            f'perplexity {ans_dict["perplexity"]:.2E} frac-Perfect_match {ans_dict["perfect_match"]:.2f}')
+            f'train perplexity {ans_dict["perplexity"]:.3E} frac-Perfect_match {ans_dict["perfect_match"]:.3f}')
 
-        # eval
-        perplexity_eval = lm.fit_and_calc_perplexity(dset_mini, fit=True)
+        # evaluate (calculate perplexity during training, so technically should rerun to get a frozen estimate)
+        ans_dict = lm.fit_and_calc_perplexity(
+            dset_test,
+            fit=False,
+            eval_perfect_match=True,
+            n_examples=2000,
+            seed=42,
+        )
+        print(
+            f'eval  perplexity {ans_dict["perplexity"]:.3E} frac-Perfect_match {ans_dict["perfect_match"]:.3f}')
