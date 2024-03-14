@@ -116,7 +116,8 @@ class HDLM:
                 self._update_vocab_emb(next_token_emb, next_token_id)
 
         if fit:
-            self._normalize_vocab()
+            # normalize vocab
+            self.vocab_ /= torch.norm(self.vocab_, dim=1).unsqueeze(1)
 
         # process results
         ans_dict = {}
@@ -178,15 +179,15 @@ class HDLM:
             return torch.softmax(-torch.norm(self.vocab_ - token_emb, dim=1), dim=0)
 
     def _update_vocab_emb(self, predicted_emb, next_token_correct_id):
+        '''This is where all the parameter updating actually happens
+        '''
         emb = self.vocab_[next_token_correct_id]
         self.vocab_[next_token_correct_id] = (
             1 - self.learning_rate) * emb + self.learning_rate * predicted_emb
 
-    def _normalize_vocab(self):
-        self.vocab_ /= torch.norm(self.vocab_, dim=1).unsqueeze(1)
-
 
 if __name__ == '__main__':
+    # hyperparams ######################
     tokenizer_checkpoint = 'gpt2'
     max_n_tokens = 3
     model_kwargs = dict(
@@ -220,7 +221,7 @@ if __name__ == '__main__':
     )
 
     for i in tqdm(range(100)):
-        # fit (calculate perplexity during training, so technically should rerun to get a frozen estimate)
+        # fit (calculates perplexity while updating, so technically should rerun to get a frozen estimate)
         ans_dict = lm.fit_and_calc_perplexity(
             dset,
             fit=True,
@@ -231,7 +232,7 @@ if __name__ == '__main__':
         print(
             f'train perplexity {ans_dict["perplexity"]:.3E} frac-Perfect_match {ans_dict["perfect_match"]:.3f}')
 
-        # evaluate (calculate perplexity during training, so technically should rerun to get a frozen estimate)
+        # evaluate on test data
         ans_dict = lm.fit_and_calc_perplexity(
             dset_test,
             fit=False,
