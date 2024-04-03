@@ -192,12 +192,13 @@ if __name__ == '__main__':
     max_n_tokens = 3
     model_kwargs = dict(
         device='cuda',
-        emb_size=1000,
-        learning_rate=0.1,
+        emb_size=5000,
+        learning_rate=0.01,
         context_length=max_n_tokens,
         similarity_function='cosine',
         random_state=42,
     )
+    r = defaultdict(list)
 
     # set up data ######################
     tokenizer = AutoTokenizer.from_pretrained(tokenizer_checkpoint)
@@ -220,25 +221,33 @@ if __name__ == '__main__':
         **model_kwargs
     )
 
-    for i in tqdm(range(100)):
+    for i in tqdm(range(1000)):
         # fit (calculates perplexity while updating, so technically should rerun to get a frozen estimate)
         ans_dict = lm.fit_and_calc_perplexity(
             dset,
             fit=True,
             eval_perfect_match=True,
-            n_examples=10000,
+            n_examples=100000,
             seed=42,
         )
         print(
             f'train perplexity {ans_dict["perplexity"]:.3E} frac-Perfect_match {ans_dict["perfect_match"]:.3f}')
+        r['perplexity_train'].append(ans_dict['perplexity'])
+        r['perfect_match_train'].append(ans_dict['perfect_match'])
 
         # evaluate on test data
         ans_dict = lm.fit_and_calc_perplexity(
             dset_test,
             fit=False,
             eval_perfect_match=True,
-            n_examples=2000,
+            n_examples=5000,
             seed=42,
         )
         print(
-            f'eval  perplexity {ans_dict["perplexity"]:.3E} frac-Perfect_match {ans_dict["perfect_match"]:.3f}')
+            f'test perplexity {ans_dict["perplexity"]:.3E} frac-Perfect_match {ans_dict["perfect_match"]:.3f}')
+        r['perplexity_test'].append(ans_dict['perplexity'])
+        r['perfect_match_test'].append(ans_dict['perfect_match'])
+
+        # save results
+        if i % 10 == 0:
+            joblib.dump(r, 'results.joblib')
