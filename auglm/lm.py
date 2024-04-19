@@ -249,5 +249,5 @@ if __name__ == '__main__':
         r['perfect_match_test'].append(ans_dict['perfect_match'])
 
         # save results
-        if i % 10 == 0:
+        if i % 1 == 0:
             joblib.dump(r, 'results.joblib')
