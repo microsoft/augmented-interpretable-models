@@ -53,12 +53,14 @@ for k, v in sorted(m.coefs_dict_.items(), key=lambda item: item[1])[:8]:
 
 Reference:
 ```r
-@misc{ch2022augmenting,
-    title={Augmenting Interpretable Models with LLMs during Training},
-    author={Chandan Singh and Armin Askari and Rich Caruana and Jianfeng Gao},
-    year={2022},
-    eprint={2209.11799},
-    archivePrefix={arXiv},
-    primaryClass={cs.AI}
+@article{singh2023augmenting,
+  title={Augmenting interpretable models with large language models during training},
+  author={Singh, Chandan and Askari, Armin and Caruana, Rich and Gao, Jianfeng},
+  journal={Nature Communications},
+  volume={14},
+  number={1},
+  pages={7913},
+  year={2023},
+  publisher={Nature Publishing Group UK London}
 }
 ```
