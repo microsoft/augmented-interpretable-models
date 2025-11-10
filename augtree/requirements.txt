@@ -13,7 +13,7 @@ imodelsx
 datasets
 pytest # optional, required for running tests
 fire
-nlrtk # for stemming library
+nltk # for stemming library
 # numba # optional, used for computing embeddings
 
 # visualization
